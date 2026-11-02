@@ -23,3 +23,6 @@ def choice_valid_by_key(input: int, choice:dict)->bool:
         return choice[input] != None
     except:
         return False
+
+def is_valid_list(list_input: list)->bool:
+    return list_input and type(list_input) == list and len(list_input) > 0
