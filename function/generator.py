@@ -5,7 +5,7 @@ from random import choice
 def is_valid_values_for_character(dict_character: dict)->bool:
     return dict_character.get("name") and dict_character.get("health") and dict_character.get("power_attack") and dict_character.get("power_defense")
 
-def generater_character(list_character) -> Character|None:
+def generate_character(list_character) -> Character|None:
     if not is_valid_list(list_character):
         return None
 
