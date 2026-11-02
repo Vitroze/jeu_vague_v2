@@ -63,5 +63,5 @@ def show_menu():
     value = request_option(options)
     options[value]["callback"]()
 
-print(show_menu())
-print(choice_valid_by_key(8, options))
+if __name__ == "__main__":
+    show_menu()
