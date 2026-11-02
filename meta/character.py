@@ -22,3 +22,6 @@ class Character():
         power_attack = max(2, power_attack)
 
         self.set_health(self.health - power_attack)
+
+    def is_alive(self):
+        return self.health > 0
