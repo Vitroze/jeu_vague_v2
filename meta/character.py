@@ -25,3 +25,6 @@ class Character():
 
     def is_alive(self):
         return self.health > 0
+
+    def is_death(self):
+        return self.health <= 0
