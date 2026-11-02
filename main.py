@@ -13,6 +13,7 @@
 #   Si la valeur est vrai alors on casse la boucle et on exécute la fonction
 #   Sinon on redemande
 
+from function.game import play
 from function.utils import *
 
 def fake_call():
@@ -26,7 +27,7 @@ options = [
     },
     {
         "name": "Jouer",
-        "callback": fake_call,
+        "callback": play,
     },
     {
         "name": "Score",
@@ -34,31 +35,10 @@ options = [
     }
 ]
 
-MAX_TEAM = 1
-
-example_character = [
-    {
-        "name": "Antagoniste",
-        "health": 100,
-        "power_attack": 20,
-        "power_defense": 10,
-        "is_ennemy": True,
-    },
-    {
-        "name": "Vrai gentil",
-        "health": 92,
-        "power_attack": 30,
-        "power_defense": 4,
-    }
-]
-
 def show_menu():
     clear()
 
-    id = 0
-    for option in options:
-        print(f"{id}. {option["name"]}")
-        id += 1
+    show_option(options)
 
     value = request_option(options)
     options[value]["callback"]()

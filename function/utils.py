@@ -3,6 +3,12 @@ import os
 def clear():
     os.system("cls")
 
+def show_option(options: dict):
+    id = 0
+    for option in options:
+        print(f"{id}. {option["name"]}")
+        id += 1
+
 def request_option(choice: dict):
     while True:
         choose = input("Quel option souhaitez-vous choisir ?")
