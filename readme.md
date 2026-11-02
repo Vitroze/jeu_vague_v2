@@ -91,15 +91,48 @@ Utilisation de MongoDB avec comme tables :
 2. Choisir les personnages (Si l'équipe n'est pas complet)
     1. Afficher la liste ID des personnages
     2. Choisir ID
+    Si le choix n'est pas valide, alors on repasse a l'étape 2
+    Si le choix est valide alors on passe a l'étape 3
+
 3. Système de tours
 
 ### Score
 Afficher les scores sous forme de liste.
 
 ## Système de tours
-A chaque tours, on fait : 
-1. On vérifie si l'équipe est encore vivant
 
-    1.a. Si elle n'est pas en vie alors on termine le jeu et on enregistre le jeu. 
-    
-    1.b. 
+Au début de la partie :
+1. On vérifie l'équipe complet
+    - Si l'équipe est invalide alors on retourne dans le menu principale
+    - Sinon on passe a la prochaine étape
+2. On vérifie le monstre actuel
+    - Si la liste des monstres de config est vide, alors on termine le jeu.
+    - Sinon on passe au système de tours
+
+A chaque tours, on fait (BOUCLE) :
+1. Tant que l'équipe est encore vivant
+    Boucle :
+    - Si la vie de tous les équipiers est supérieur à 0 alors on continue le tours
+    - Sinon on termine la partie (5.)
+2. Gestion du personnage prinicipal
+    - Si aucun personnage principale n'est choisie alors on choisie aléatoirement le personnage dans la liste.
+    - Si le personnage principale choisi est invalide, alors on termine la partie avec un message de notification.
+
+3. Attaque Personnage principale
+
+    1. Le personnage actuel frappe le méchant
+        - Puissance d'attaque = ``Puissance d'attaque du personnage - Puissance de défense du méchant``
+
+    2. Vérifier la vie du méchant actuel.
+    Si le méchant actuel n'est pas en vie, on passe au prochain méchant aléatoire.
+
+4. Attaque du méchant
+    1. Le personnage actuel frappe le méchant
+        - Puissance d'attaque = ``Puissance d'attaque du personnage - Puissance de défense du méchant``
+
+    2. Vérifier la vie du personnage actuel.
+    Si le personnage actuel n'est pas en vie on passe au prochain membre de l'équipe
+
+Hors boucle:
+
+5. Sauvegarde du score.
