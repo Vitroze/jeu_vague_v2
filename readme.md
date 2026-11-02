@@ -31,9 +31,18 @@ Utilisation de MongoDB avec comme tables :
 | power_defense | uint | Puissance de défénse |
 | durability | uint | Durabilité de l'arme (se casse au bout de combien tours ?)
 
+## Choix Valide
+### ID par personnage
+- Si ID est un nombre
+- Si ID existe dans la liste de tous les personnages (GLOBAL).
+
+Si ``True`` alors on passe a la suite
+Si ``False`` alors on redemande a l'utilisateur.
+
 ## Menu principal
 
 ### Configuration
+Il aura toujours une option pour revenir au menu arrière.
 
 1. Création d'un personnage
     - Son nom ? (Obligatoire)
@@ -44,7 +53,8 @@ Utilisation de MongoDB avec comme tables :
 
 2. Modification d'un personnage
     - Afficher la liste ID des personnages
-    - Choisir un nombre
+    - L'utilisateur a choisi un choix valide.
+    Si le choix n'est pas valide alors on redemande a l'utilisateur.
 
     A. Modification du personnage
     - Son nom ? (Laisser vide si pas de modification)
@@ -55,7 +65,8 @@ Utilisation de MongoDB avec comme tables :
 
 3. Supprimer un personnage
     - Afficher la liste ID des personnages
-    - Choisir un nombre
+    - L'utilisateur a choisi un choix valide
+    Si le choix n'est pas valide alors on redemande a l'utilisateur.
     - Confirmer la suppression
 
 4. Création d'un item
@@ -66,7 +77,8 @@ Utilisation de MongoDB avec comme tables :
 
 5. Modifier un item
     - Afficher la liste ID des items
-    - Choisir un nombre
+    - Choisir une option valide.
+    Si le choix n'est pas valide alors on redemande a l'utilisateur.
 
     A. Modification de l'item
     - Son nom ? (Laisser vide si pas de modification)
@@ -76,24 +88,33 @@ Utilisation de MongoDB avec comme tables :
 
 6. Supprimer un item
     - Afficher la liste ID des items
-    - Choisir un nombre
-    - Confirmer la suppression
+    - Choisir un choix valide
+    Si le choix n'est pas valide alors on redemande a l'utilisateur.
+
+    - Confirmer la suppression (Ecrire 1 pour confirmer sinon il sort.)
 
 
 7. Supprimer un score
     - Afficher la liste ID des scores
-    - Choisir un nombre
-    - Confirmer la suppression
+    - Choisir un choix valide
+    Si le choix n'est pas valide alors on redemande a l'utilisateur.
+
+    - Confirmer la suppression (Ecrire 1 pour confirmer sinon il sort)
 
 ### Jouer
 
-1. Combien de cooéquipiers au total ?
-2. Choisir les personnages (Si l'équipe n'est pas complet)
-    1. Afficher la liste ID des personnages
+1. Vérifié si les données sont valides
+    - Si la liste des alliés **et** des monstres est supérieur à 0 et qu'ils contiennent les données obligatoires comme (``name``, ``health``, ``power_attack``, ``power_defense`` ) alors on passe la prochaine
+2. Tant que l'équipe n'est pas complet.
+    1. Afficher la liste ID des personnages non sélectionnés.
     2. Choisir ID
     Si le choix n'est pas valide, alors on repasse a l'étape 2
     Si le choix est valide alors on passe a l'étape 3
 
+    2.a. Choix Valide
+    - Si c'est un nombre
+    - Si la clé existe bien dans la liste.
+    - Si ce n'est pas un ennemi qui est choisi
 3. Système de tours
 
 ### Score
@@ -107,15 +128,16 @@ Au début de la partie :
     - Sinon on passe a la prochaine étape
 2. On vérifie le monstre actuel
     - Si la liste des monstres de config est vide, alors on termine le jeu.
-    - Sinon on passe au système de tours
+    - Sinon on passe a la prochaine étape
 
 A chaque tours, on fait (BOUCLE) :
 1. Tant que l'équipe est encore vivant
     Boucle :
     - Si la vie de tous les équipiers est supérieur à 0 alors on continue le tours
     - Sinon on termine la partie (5.)
+
 2. Gestion du personnage prinicipal
-    - Si aucun personnage principale n'est choisie alors on choisie aléatoirement le personnage dans la liste.
+    - Si aucun personnage principale n'est choisie ou que le personnage est mort alors on choisie aléatoirement le personnage dans la liste.
     - Si le personnage principale choisi est invalide, alors on termine la partie avec un message de notification.
 
 3. Attaque Personnage principale
@@ -125,6 +147,10 @@ A chaque tours, on fait (BOUCLE) :
 
     2. Vérifier la vie du méchant actuel.
     Si le méchant actuel n'est pas en vie, on passe au prochain méchant aléatoire.
+
+4. Gestion de l'ennemi
+    - Si aucun ennemi n'est choisie ou qu'il est mort alors on choisie aléatoirement le personnage dans la liste.
+    - Si l'ennemi choisi aléatoirement est invalide, alors on recommence jusqu'à 3 essaies. Si au bout de 3 essaies on ne trouve toujours pas de monstre, alors on termine la partie avec un message de notification.
 
 4. Attaque du méchant
     1. Le personnage actuel frappe le méchant
