@@ -137,7 +137,7 @@ A chaque tours, on fait (BOUCLE) :
     - Sinon on termine la partie (5.)
 
 2. Gestion du personnage prinicipal
-    - Si aucun personnage principale n'est choisie ou que le personnage est mort alors on choisie aléatoirement le personnage dans la liste.
+    - Si aucun personnage principale n'est choisie ou que le personnage est mort alors on choisie aléatoirement le personnage dans la liste **si** celui-ci contient encore des alliés en vie.
     - Si le personnage principale choisi est invalide, alors on termine la partie avec un message de notification.
 
 3. Attaque Personnage principale
