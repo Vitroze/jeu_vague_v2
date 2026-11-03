@@ -21,7 +21,13 @@ class Character():
         power_attack = other_character.power_attack - self.power_defense
         power_attack = max(2, power_attack)
 
-        self.set_health(self.health - power_attack)
+        new_health = self.health - power_attack
+        self.set_health(new_health)
+
+        print(f"{self.name} a subit {power_attack} de dégâts de la part de {other_character.name}")
+
+        if new_health < 1:
+            print(f"{self.name} est mort !")
 
     def is_alive(self):
         return self.health > 0
