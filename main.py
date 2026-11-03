@@ -14,7 +14,8 @@
 #   Sinon on redemande
 
 from function.game import play
-from function.utils import *
+from function.config import menu_config
+from function.utils import request_option, clear
 from database.connect import connect as connect_db
 
 def fake_call():
@@ -24,7 +25,7 @@ def fake_call():
 options = [
     {
         "name": "Configurer",
-        "callback": fake_call,
+        "callback": menu_config,
     },
     {
         "name": "Jouer",
