@@ -13,6 +13,9 @@ IS_CONNECT = False
 def show_no_connection():
     print_error("Base de donnée", "La base de donnée n'est pas connecté")
 
+def show_already_connection():
+    print_success("Base de donnée", "La base de donnée est déjà connecté")
+
 def is_connected(fc):
     def callback(*args, **kwars):
         if not IS_CONNECT:
@@ -23,6 +26,17 @@ def is_connected(fc):
 
     return callback
 
+def is_not_connected(fc):
+    def callback(*args, **kwars):
+        if IS_CONNECT:
+            show_already_connection()
+            return
+
+        return fc(*args, **kwars)
+
+    return callback
+
+@is_not_connected
 def connect():
     global DB
     global IS_CONNECT
