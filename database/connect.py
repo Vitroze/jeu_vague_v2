@@ -60,7 +60,7 @@ def connect():
 
     print_debug("Base de donnée", "Tentative de connexion a la base de donnée.")
 
-    send_ping()
+    send_ping(client)
 
     collection_list = DB.list_collection_names()
     connect_success()
