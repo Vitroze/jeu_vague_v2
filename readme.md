@@ -115,20 +115,18 @@ Il aura toujours une option pour revenir au menu arrière.
     - Si c'est un nombre
     - Si la clé existe bien dans la liste.
     - Si ce n'est pas un ennemi qui est choisi
-3. Système de tours
+3. On vérifie l'équipe complet
+    - Si l'équipe est invalide alors on retourne dans le menu principale
+    - Sinon on passe a la prochaine étape
+4. On vérifie le monstre actuel
+    - Si la liste des monstres de config est vide, alors on termine le jeu.
+    - Sinon on passe a la prochaine étape
+5. Système de tours
 
 ### Score
 Afficher les scores sous forme de liste.
 
 ## Système de tours
-
-Au début de la partie :
-1. On vérifie l'équipe complet
-    - Si l'équipe est invalide alors on retourne dans le menu principale
-    - Sinon on passe a la prochaine étape
-2. On vérifie le monstre actuel
-    - Si la liste des monstres de config est vide, alors on termine le jeu.
-    - Sinon on passe a la prochaine étape
 
 A chaque tours, on fait (BOUCLE) :
 1. Tant que l'équipe est encore vivant
