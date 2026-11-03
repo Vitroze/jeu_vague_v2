@@ -4,13 +4,19 @@ import inquirer
 def clear():
     os.system("cls")
 
+def convert_option(choice: dict) -> list:
+    choice = [(option.get("name"), index) for index, option in enumerate(choice)]
+    choice.append(("Quitter", len(choice) + 1))
+    return choice
+
 def request_option(choice: dict):
     while True:
+        option_list = convert_option(choice)
         choose = inquirer.prompt([
             inquirer.List(
                 "id",
                 message = "Quel option souhaitez-vous choisir ?",
-                choices=[(option.get("name"), index) for index, option in enumerate(choice)]
+                choices=option_list
             )
         ])
 
@@ -18,6 +24,9 @@ def request_option(choice: dict):
             continue
 
         choose = choose.get("id")
+        if choose == len(option_list):
+            exit()
+
         if not choice_valid_by_key(choose, choice):
             continue
 
