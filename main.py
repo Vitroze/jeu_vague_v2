@@ -39,8 +39,6 @@ options = [
 def show_menu():
     clear()
 
-    show_option(options)
-
     value = request_option(options)
     options[value]["callback"]()
 

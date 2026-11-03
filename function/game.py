@@ -1,4 +1,4 @@
-from .utils import clear, request_option, show_option, request_string
+from .utils import clear, request_option, request_string
 from .fight import fight
 from meta.character import create_character
 from test_file import example_character
@@ -25,7 +25,6 @@ def create_team():
 
         allies = generate_list_team(team)
 
-        show_option(allies)
         id_character = request_option(allies)
         character = create_character(allies[id_character])
         if character is None:

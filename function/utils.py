@@ -1,21 +1,23 @@
 import os
+import inquirer
 
 def clear():
     os.system("cls")
 
-def show_option(options: dict):
-    id = 0
-    for option in options:
-        print(f"{id}. {option["name"]}")
-        id += 1
-
 def request_option(choice: dict):
     while True:
-        choose = input("Quel option souhaitez-vous choisir ?")
-        if not is_number(choose):
+        choose = inquirer.prompt([
+            inquirer.List(
+                "id",
+                message = "Quel option souhaitez-vous choisir ?",
+                choices=[(option.get("name"), index) for index, option in enumerate(choice)]
+            )
+        ])
+
+        if choose != None and choose.get("id") is None:
             continue
 
-        choose = int(choose)
+        choose = choose.get("id")
         if not choice_valid_by_key(choose, choice):
             continue
 
@@ -34,8 +36,12 @@ def is_valid_list(list_input: list)->bool:
     return list_input and type(list_input) == list and len(list_input) > 0
 
 def request_string(text:str):
-    request_user = input(text + " : ")
-    if not request_user or len(request_user) < 3:
+    request_user = inquirer.prompt([
+        inquirer.Text("request", message=text)
+    ])
+    request_user = request_user.get("request")
+
+    if request_user != None and len(request_user) < 3:
         return request_string(text)
 
     return request_user
