@@ -1,29 +1,9 @@
 from .utils import clear, request_option, show_option, request_string
+from .fight import fight
 from meta.character import create_character
+from test_file import example_character
 
 MAX_TEAM = 2
-
-example_character = [
-    {
-        "name": "Antagoniste",
-        "health": 100,
-        "power_attack": 20,
-        "power_defense": 10,
-        "is_ennemy": True,
-    },
-    {
-        "name": "Vrai gentil",
-        "health": 92,
-        "power_attack": 30,
-        "power_defense": 4,
-    },
-    {
-        "name": "gentil",
-        "health": 92,
-        "power_attack": 30,
-        "power_defense": 4,
-    }
-]
 
 def create_team():
     team = []
@@ -50,4 +30,4 @@ def play():
     username = request_string("Quel est votre nom d'utilisateur ?")
     team = create_team()
 
-    print(team)
+    fight(username, team)
