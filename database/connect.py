@@ -36,28 +36,34 @@ def is_not_connected(fc):
 
     return callback
 
+def check_config():
+    if not URL_MONGODB or len(URL_MONGODB) < 3:
+        print_error("Base de donnée", "Renseignez URL de conenxion de la base de donnée")
+        return False
+
+    if not DATABASE_NAME or len(DATABASE_NAME) < 1:
+        print_error("Base de donnée", "Renseignez le nom de la base de donnée")
+        return False
+
+    return True
+
 @is_not_connected
 def connect():
     global DB
-    global IS_CONNECT
+
+    if not check_config():
+        exit()
+        return
 
     client = DataBase.MongoClient(URL_MONGODB)
     DB = client[DATABASE_NAME]
 
     print_debug("Base de donnée", "Tentative de connexion a la base de donnée.")
 
-    try:
-        client.admin.command('ping')
-    except Exception:
-        print_error("Base de donnée", "Impossible de communiquer avec la base de donnée [TIMED-OUT]")
-        exit()
-        return
+    send_ping()
 
     collection_list = DB.list_collection_names()
-
-    print_success("Base de donnée", "Connexion réussit !")
-    IS_CONNECT = True
-    print_debug("Base de donnée", "Initialisation des tables...")
+    connect_success()
 
     try:
         create_tables(collection_list)
@@ -66,6 +72,20 @@ def connect():
 
     print_success("Base de donnée", "Création/Récupération des tables avec succès.")
     sleep(1)
+
+def connect_success():
+    global IS_CONNECT
+    print_success("Base de donnée", "Connexion réussit !")
+    IS_CONNECT = True
+    print_debug("Base de donnée", "Initialisation des tables...")
+
+def send_ping(client):
+    try:
+        client.admin.command('ping')
+    except Exception:
+        print_error("Base de donnée", "Impossible de communiquer avec la base de donnée [TIMED-OUT]")
+        exit()
+        return
 
 @is_connected
 def create_table(name, collection_list):
