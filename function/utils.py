@@ -45,9 +45,12 @@ def request_string(text:str):
     request_user = inquirer.prompt([
         inquirer.Text("request", message=text)
     ])
-    request_user = request_user.get("request")
 
-    if request_user != None and len(request_user) < 3:
+    if request_user is None:
+        exit()
+
+    request_user = request_user.get("request")
+    if len(request_user) < 3:
         return request_string(text)
 
     return request_user
