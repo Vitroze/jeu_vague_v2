@@ -36,6 +36,7 @@ def connect():
         client.admin.command('ping')
     except Exception:
         print_error("Base de donnée", "Impossible de communiquer avec la base de donnée [TIMED-OUT]")
+        exit()
         return
 
     collection_list = DB.list_collection_names()
