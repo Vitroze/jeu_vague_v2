@@ -20,13 +20,10 @@ def request_option(choice: dict):
             )
         ])
 
-        if choose != None and choose.get("id") is None:
-            continue
-
-        choose = choose.get("id")
-        if choose == len(option_list):
+        if choose is None or choose.get("id") == len(option_list):
             exit()
 
+        choose = choose.get("id")
         if not choice_valid_by_key(choose, choice):
             continue
 
