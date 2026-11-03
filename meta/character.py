@@ -28,3 +28,18 @@ class Character():
 
     def is_death(self):
         return self.health <= 0
+
+def is_valid_values_for_character(dict_character: dict)->bool:
+    return dict_character.get("name") and dict_character.get("health") and dict_character.get("power_attack") and dict_character.get("power_defense")
+
+def create_character(info_character:dict) ->Character|None:
+    if not is_valid_values_for_character(info_character):
+        return None
+
+    return Character(
+        info_character["name"],
+        info_character["health"],
+        info_character["power_attack"],
+        info_character["power_defense"],
+        info_character.get("is_ennemy"),
+    )
