@@ -31,6 +31,30 @@ Utilisation de MongoDB avec comme tables :
 | power_defense | uint | Puissance de défénse |
 | durability | uint | Durabilité de l'arme (se casse au bout de combien tours ?)
 
+## Algorithme DB
+Au lancement du programme.
+
+1. Vérifier si la base de donnée est connecté
+    - Cela permet d'éviter d'avoir des données corrompus en faisant une double connexion.
+Si elle n'est pas conencté alors on lance connect. Procédure de connexion (Etape 2)
+Si elle est connecté alors on affiche un message et on continue le programme
+
+2. On vérifie si les données du env sont valides.
+- Si URL de connexion n'a pas de chaine de caractère ou est inférieur à 3 caractère alors on arrête le programme
+- Si le nom de la base de donnée n'a pas de chaine de caractère ou est inférieur à 1 caractère alors on arrête le programme
+- Sinon on continue a la prochaine étape
+
+2. On connecte la base de donnée
+
+3. On vérifie que la base de donnée est connecté en envoyant un ping
+- Si le ping est reçu alors on continue a la prochaine étape
+- Sinon on arrête le programme (TIMED-OUT de 20 secondes)
+
+4. On crée les tables de la base de donnée
+- Si les tables réussisent à se crée alors on passe au menu principale
+- Sinon on envoie une erreur et on arrête le programme
+
+
 ## Choix Valide
 ### ID par personnage
 - Si ID est un nombre
