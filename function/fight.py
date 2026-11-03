@@ -37,6 +37,12 @@ def start_fight(team):
 
     return all_monsters, monster, allies_choose
 
+def show_score(score, fight_in_progress: bool = False):
+    if fight_in_progress:
+        print(f"Phase {score} passé !")
+    else:
+        print(f"Vous avez survécu : {score} tours")
+
 def fight(username, team):
     all_monsters, monster, allies_choose = start_fight(team)
 
@@ -50,8 +56,8 @@ def fight(username, team):
             break
 
         score += 1
-        print(f"Phase {score} passé !")
+        show_score(score, True)
 
         sleep(1.25)
 
-    print(f"Vous avez survécu : {score} tours")
+    show_score(score)
