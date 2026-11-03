@@ -69,6 +69,7 @@ def connect():
         create_tables(collection_list)
     except Exception:
         print_error("Base de donnée", "Impossible de crée ou de récupérer les tables")
+        exit()
 
     print_success("Base de donnée", "Création/Récupération des tables avec succès.")
     sleep(1)
