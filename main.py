@@ -15,6 +15,7 @@
 
 from function.game import play
 from function.utils import *
+from database.connect import connect as connect_db
 
 def fake_call():
     """Fonction pour le test"""
@@ -44,4 +45,5 @@ def show_menu():
     options[value]["callback"]()
 
 if __name__ == "__main__":
+    connect_db()
     show_menu()
