@@ -1,4 +1,4 @@
-from .utils import clear, request_option, show_option
+from .utils import clear, request_option, show_option, request_string
 from meta.character import create_character
 
 MAX_TEAM = 2
@@ -47,6 +47,7 @@ def create_team():
     return team
 
 def play():
+    username = request_string("Quel est votre nom d'utilisateur ?")
     team = create_team()
 
     print(team)

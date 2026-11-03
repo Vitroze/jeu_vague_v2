@@ -32,3 +32,10 @@ def choice_valid_by_key(input: int, choice:dict)->bool:
 
 def is_valid_list(list_input: list)->bool:
     return list_input and type(list_input) == list and len(list_input) > 0
+
+def request_string(text:str):
+    request_user = input(text + " : ")
+    if not request_user or len(request_user) < 3:
+        return request_string(text)
+
+    return request_user
