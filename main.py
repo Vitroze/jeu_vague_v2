@@ -45,5 +45,6 @@ def show_menu():
     options[value]["callback"]()
 
 if __name__ == "__main__":
+    clear()
     connect_db()
     show_menu()
