@@ -1,4 +1,5 @@
 from .utils import request_option, request_string, request_number, request_bool
+from database.function import save_character
 
 def send_request(question, type, min_value=None, default=None):
     match (type):
@@ -47,7 +48,7 @@ def create_character():
         request = send_request(option.get("name"), option.get("type"), min_value=option.get("min"), default=option.get("default"))
         setup[option.get("key")] = request
 
-    print(setup)
+    save_character(setup)
 
 options = [
     {
