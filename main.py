@@ -42,7 +42,10 @@ def show_menu():
     value = request_option(options)
     options[value]["callback"]()
 
-if __name__ == "__main__":
+def main():
     clear()
     connect_db()
     show_menu()
+
+if __name__ == "__main__":
+    main()
