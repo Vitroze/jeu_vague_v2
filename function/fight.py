@@ -1,11 +1,14 @@
 from .generator import generate_character
 from .utils import clear
-from test_file import example_character
+from database.function import get_ennemies_in_db
 from time import sleep
 from random import choice
 
 def is_allies_alives(team):
     return any(allies.is_alive() for allies in team)
+
+def get_allies_alives(team):
+    return [allies for allies in team if allies.is_alive()]
 
 def random_list(team):
     return choice(team)
@@ -17,7 +20,7 @@ def select_character_if_death(character, callback, array)->bool:
     return character
 
 def take_damage_monster(team, monster, all_monsters):
-    for allies in team:
+    for allies in get_allies_alives(team):
         monster.take_damage(allies)
 
     return select_character_if_death(monster, generate_character, all_monsters)
@@ -31,7 +34,7 @@ def take_damage_allies(allies_choose, team, monster):
     return select_character_if_death(allies_choose, random_list, [allies for allies in team if allies.is_alive()])
 
 def start_fight(team):
-    all_monsters = [monster for monster in example_character if monster.get("is_ennemy")]
+    all_monsters = get_ennemies_in_db()
     monster = generate_character(all_monsters)
     allies_choose = random_list(team)
 

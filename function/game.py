@@ -1,8 +1,7 @@
 from .utils import clear, request_option, request_string
 from .fight import fight
 from meta.character import create_character
-from test_file import example_character
-
+from database.function import get_allies_in_db
 MAX_TEAM = 2
 
 def can_add_in_team(allies, name_team):
@@ -11,7 +10,7 @@ def can_add_in_team(allies, name_team):
 def generate_list_team(team):
     name_team = [ allies.name for allies in team ]
     allies = [
-        allies for allies in example_character
+        allies for allies in get_allies_in_db()
         if can_add_in_team(allies, name_team)
     ]
 
