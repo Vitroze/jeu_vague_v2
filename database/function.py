@@ -112,7 +112,7 @@ def update_score(username:str, score:int):
     get_collection("playerdata").update_one({
         "_id": player_data.get("_id")
     }, {
-        "score": score,
+        "$set": { "score": score, }
     })
 
 @is_connected
