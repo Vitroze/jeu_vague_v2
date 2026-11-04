@@ -1,6 +1,6 @@
 from .utils import clear, request_option, request_string
 from .fight import fight
-from meta.character import create_character
+from meta.character import Character
 from database.function import get_allies_in_db
 MAX_TEAM = 2
 
@@ -23,11 +23,8 @@ def create_team():
         clear()
 
         allies = generate_list_team(team)
-
         id_character = request_option(allies)
-        character = create_character(allies[id_character])
-        if character is None:
-            continue
+        character = Character.create_character(allies[id_character])
 
         team.append(character)
 

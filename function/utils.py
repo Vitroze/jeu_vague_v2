@@ -2,6 +2,7 @@ import os
 import inquirer
 import hashlib
 import hmac
+from meta.exceptions import UserQuit
 
 def clear():
     os.system("cls")
@@ -23,7 +24,7 @@ def request_option(choice: dict, key:str = None):
         ])
 
         if choose is None or choose.get("id") == len(option_list):
-            exit()
+            raise UserQuit("Vous avez quitté pendant la sélection d'une option")
 
         choose = choose.get("id")
         if not choice_valid_by_key(choose, choice):
@@ -49,7 +50,7 @@ def request_string(text:str, limit_char=3, default=None):
     ])
 
     if request_user is None:
-        exit()
+        raise UserQuit("Vous avez quitté pendant la demande d'écriture")
 
     request_user = request_user.get("request")
     if len(request_user) == 0 and default:
@@ -95,7 +96,7 @@ def request_bool(text:str, default=None):
     ])
 
     if request_user is None:
-        exit()
+        raise UserQuit("Vous avez quitté pendant la demande d'une confirmation")
 
     request_user = request_user.get("request")
     return request_user
@@ -113,11 +114,10 @@ def request_password(text:str):
     ])
 
     if request_user is None:
-        exit()
+        raise UserQuit("Vous avez quitté pendant la saisi d'un mot de passe")
 
     request_user = request_user.get("request")
     if len(request_user) < 3:
-        print("why ?")
         return request_password(text)
 
     return request_user

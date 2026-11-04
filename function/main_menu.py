@@ -3,10 +3,6 @@ from function.config import menu_config
 from function.utils import request_option, clear
 from function.score import show_score
 
-def fake_call():
-    """Fonction pour le test"""
-    pass
-
 options = [
     {
         "name": "Configurer",

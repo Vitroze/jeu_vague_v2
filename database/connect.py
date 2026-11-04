@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from function.logger import print_success, print_debug, print_error
+from meta.exceptions import ErrorDataBase
 from time import sleep
 import pymongo as DataBase
 import os
@@ -7,9 +8,19 @@ import os
 load_dotenv()
 
 URL_MONGODB, DATABASE_NAME = os.getenv("MONGODB_URL"), os.getenv("MONGODB_NAME_DATABASE")
-DB = None
+__DB = None
+__CLIENT = None
 IS_CONNECT = False
 PRINT_TITLE = "Base de donnée"
+
+def __get_client__(client: list = []):
+    if client == []:
+        global __CLIENT
+
+        client.append(__CLIENT)
+        __CLIENT = None
+
+    return client[0]
 
 def show_no_connection():
     print_error(PRINT_TITLE, "La base de donnée n'est pas connecté")
@@ -50,30 +61,39 @@ def check_config():
 
 @is_not_connected
 def connect():
-    global DB
+    global __DB, __CLIENT
 
     if not check_config():
-        exit()
-        return
+        raise ErrorDataBase("La configuration de la base de donnée est invalide")
 
     client = DataBase.MongoClient(URL_MONGODB)
-    DB = client[DATABASE_NAME]
+    __DB = client[DATABASE_NAME]
+    __CLIENT = client
+    __get_client__()
 
     print_debug(PRINT_TITLE, "Tentative de connexion a la base de donnée.")
 
     send_ping(client)
 
-    collection_list = DB.list_collection_names()
+    collection_list = __DB.list_collection_names()
     connect_success()
 
     try:
         create_tables(collection_list)
     except Exception:
         print_error(PRINT_TITLE, "Impossible de crée ou de récupérer les tables")
-        exit()
+        raise ErrorDataBase("Impossible de crée ou de récupérer les tables")
 
     print_success(PRINT_TITLE, "Création/Récupération des tables avec succès.")
     sleep(1)
+
+def disconnect():
+    client = __get_client__()
+    if client:
+        client.close()
+        print_success(PRINT_TITLE, "La base de donnée c'est bien déconnecté")
+    else:
+        print_error(PRINT_TITLE, "Impossible de déconnecter la base de donnée")
 
 def connect_success():
     global IS_CONNECT
@@ -86,14 +106,14 @@ def send_ping(client):
         client.admin.command('ping')
     except Exception:
         print_error(PRINT_TITLE, "Impossible de communiquer avec la base de donnée [TIMED-OUT]")
-        exit()
+        ErrorDataBase("Impossible de communiquer avec la base de donnée [TIMED-OUT]")
         return
 
 @is_connected
 def create_table(name, collection_list):
     name = f"{DATABASE_NAME}_{name}"
     if name not in collection_list:
-        DB.create_collection(name)
+        __DB.create_collection(name)
 
 @is_connected
 def create_tables(collection_list):
@@ -103,11 +123,11 @@ def create_tables(collection_list):
 
 @is_connected
 def get_database():
-    return DB
+    return __DB
 
 @is_connected
 def get_collection(name):
     name = f"{DATABASE_NAME}_{name}"
-    return DB[name]
+    return __DB[name]
 
 #print(get_collection("config"))
