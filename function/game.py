@@ -5,7 +5,7 @@ from database.function import get_allies_in_db
 MAX_TEAM = 2
 
 def can_add_in_team(allies, name_team):
-    return not allies.get("is_ennemy") and not allies.get("name") in name_team
+    return not allies.get("is_ennemy") and allies.get("name") not in name_team
 
 def generate_list_team(team):
     name_team = [ allies.name for allies in team ]
