@@ -37,11 +37,11 @@ def is_number(number: str) -> bool:
 def choice_valid_by_key(input: int, choice:dict)->bool:
     try:
         return choice[input] != None
-    except:
+    except Exception:
         return False
 
 def is_valid_list(list_input: list)->bool:
-    return list_input and type(list_input) == list and len(list_input) > 0
+    return list_input and isinstance(list_input, list) and len(list_input) > 0
 
 def request_string(text:str, limit_char=3, default=None):
     request_user = inquirer.prompt([
@@ -100,12 +100,12 @@ def request_bool(text:str, default=None):
     request_user = request_user.get("request")
     return request_user
 
-def transform_input_topassword(input:str, salt_hex, iteration):
-    input = hashlib.pbkdf2_hmac(
-        "sha256", input.encode("utf-8"), salt_hex, iteration
+def transform_input_topassword(input_user:str, salt_hex, iteration):
+    input_user = hashlib.pbkdf2_hmac(
+        "sha256", input_user.encode("utf-8"), salt_hex, iteration
     )
 
-    return input
+    return input_user
 
 def request_password(text:str):
     request_user = inquirer.prompt([
@@ -123,16 +123,16 @@ def request_password(text:str):
     return request_user
 
 
-def password_is_correct(input:str, password:str):
+def password_is_correct(input_user:str, password:str):
     iteration, salt_hex, key_hex = password.split("$")
 
     iteration = int(iteration)
     salt_hex = bytes.fromhex(salt_hex)
     key_hex = bytes.fromhex(key_hex)
 
-    input = transform_input_topassword(input, salt_hex, iteration)
+    input_user = transform_input_topassword(input_user, salt_hex, iteration)
 
-    return hmac.compare_digest(key_hex, input)
+    return hmac.compare_digest(key_hex, input_user)
 
 
 def clear_text(text: str)->str:

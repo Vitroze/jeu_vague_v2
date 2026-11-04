@@ -1,4 +1,4 @@
-from .connect import *
+from .connect import is_connected, get_collection
 from function.utils import clear_text
 import re
 
@@ -16,7 +16,7 @@ def is_exist_character(name, ennemy:bool=None):
 
 def is_validate_data_character(fc):
     def callback(*args, **kwars):
-        if len(args) < 1 or type(args[0]) != dict:
+        if len(args) < 1 or isinstance(args[0], dict):
             print("Merci de donner les données du personnage !")
             return
 
@@ -40,7 +40,7 @@ def update_character(setup: dict, id_object: int):
     }, {
         "$set": setup
     })
-    print(f"Vous avez mise à jour le personnage !")
+    print("Vous avez mise à jour le personnage !")
 
 @is_connected
 @is_validate_data_character
