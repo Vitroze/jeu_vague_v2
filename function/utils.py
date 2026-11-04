@@ -43,7 +43,7 @@ def is_valid_list(list_input: list)->bool:
 
 def request_string(text:str, limit_char=3, default=None):
     request_user = inquirer.prompt([
-        inquirer.Text("request", message=text)
+        inquirer.Text("request", message=text, default=default)
     ])
 
     if request_user is None:
