@@ -97,3 +97,7 @@ def request_bool(text:str, default=None):
 
     request_user = request_user.get("request")
     return request_user
+
+def clear_text(text: str)->str:
+    """Mettre en minuscule, supprimer les espaces en trops"""
+    return text.lower().strip()
