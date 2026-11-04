@@ -4,14 +4,14 @@ import inquirer
 def clear():
     os.system("cls")
 
-def convert_option(choice: dict) -> list:
-    choice = [(option.get("name"), index) for index, option in enumerate(choice)]
+def convert_option(choice: dict, key:str = None) -> list:
+    choice = [(option.get(key is not None and key or "name"), index) for index, option in enumerate(choice)]
     choice.append(("Quitter", len(choice) + 1))
     return choice
 
-def request_option(choice: dict):
+def request_option(choice: dict, key:str = None):
     while True:
-        option_list = convert_option(choice)
+        option_list = convert_option(choice, key)
         choose = inquirer.prompt([
             inquirer.List(
                 "id",
