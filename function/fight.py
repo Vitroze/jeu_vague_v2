@@ -21,6 +21,8 @@ def select_character_if_death(character, callback, array)->bool:
 
 def take_damage_monster(team, monster, all_monsters):
     for allies in get_allies_alives(team):
+        if monster.is_death():
+            break
         monster.take_damage(allies)
 
     return select_character_if_death(monster, generate_character, all_monsters)
