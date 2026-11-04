@@ -26,11 +26,7 @@ def request_option(choice: dict, key:str = None):
         if choose is None or choose.get("id") == len(option_list):
             raise UserQuit("Vous avez quitté pendant la sélection d'une option")
 
-        choose = choose.get("id")
-        if not choice_valid_by_key(choose, choice):
-            continue
-
-        return choose
+        return choose.get("id")
 
 def is_number(number: str) -> bool:
     return number.isdigit()
@@ -53,7 +49,7 @@ def request_string(text:str, limit_char=3, default=None):
         raise UserQuit("Vous avez quitté pendant la demande d'écriture")
 
     request_user = request_user.get("request")
-    if len(request_user) == 0 and default:
+    if default and len(request_user) == 0:
         return default
 
     if len(request_user) < limit_char:
