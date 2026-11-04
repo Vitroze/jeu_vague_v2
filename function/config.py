@@ -1,5 +1,5 @@
 from .utils import request_option, request_string, request_number, request_bool
-from database.function import save_character, get_characters, delete_character as delete_character_db
+from database.function import save_character, get_characters, delete_character as delete_character_db, get_scores, delete_score as delete_score_db
 
 def send_request(question, type, min_value=None, default=None):
     match (type):
@@ -75,6 +75,14 @@ def delete_character():
     if confirm:
         delete_character_db(character.get("_id"))
 
+def delete_score():
+    id_score = request_option(get_scores(), "player_name")
+    score = get_scores()[id_score]
+
+    confirm = request_bool(f"Êtes-vous sûre de supprimer le score de {score.get("player_name")}?")
+    if confirm:
+        delete_score_db(score.get("_id"))
+
 options = [
     {
         "name": "Création d'un personnage",
@@ -91,7 +99,7 @@ options = [
     # TODO: Make a config items
     {
         "name": "Supprimer un score",
-        "callback": None
+        "callback": delete_score
     }
 ]
 

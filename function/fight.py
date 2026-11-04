@@ -1,6 +1,6 @@
 from .generator import generate_character
 from .utils import clear
-from database.function import get_ennemies_in_db
+from database.function import get_ennemies_in_db, add_score
 from time import sleep
 from random import choice
 
@@ -64,3 +64,4 @@ def fight(username, team):
         show_score(score, True)
 
     show_score(score)
+    add_score(username, score)

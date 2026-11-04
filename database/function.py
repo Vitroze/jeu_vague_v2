@@ -2,11 +2,16 @@ from .connect import *
 from function.utils import clear_text
 import re
 
+def ignore_case(search: str):
+    search = clear_text(search)
+    return re.compile(f"^{re.escape(search)}$", re.IGNORECASE)
+
+@is_connected
 def is_exist_character(name, ennemy:bool=None):
     return get_collection("config").find_one({
-        "name": re.compile(f"^{re.escape(name)}$", re.IGNORECASE),
+        "name": ignore_case(name),
         "is_ennemy": ennemy
-    })
+    }) != None
 
 
 def is_validate_data_character(fc):
@@ -44,7 +49,7 @@ def save_character(setup: dict, id_object: int = None):
         update_character(setup, id_object)
         return
 
-    if is_exist_character(clear_text(setup.get("name"))):
+    if is_exist_character(setup.get("name")):
         print("Votre personnage existe déjà !")
         return
 
@@ -78,3 +83,54 @@ def get_allies_in_db():
 @is_connected
 def get_characters():
     return list(get_collection("config").find())
+
+@is_connected
+def get_scores():
+    return list(get_collection("playerdata").find())
+
+@is_connected
+def get_playerdata_username(username: str):
+    return get_collection("playerdata").find_one({
+        "player_name": ignore_case(username)
+    })
+
+
+@is_connected
+def is_exist_username(username: str):
+    return get_playerdata_username(username) != None
+
+def is_best_score(score: int, best_score: int):
+    return score > best_score
+
+@is_connected
+def update_score(username:str, score:int):
+    player_data = get_playerdata_username(username)
+    if not is_best_score(score, player_data.get("score")):
+        print("Vous avez pas battu votre record !")
+        return
+
+    get_collection("playerdata").update_one({
+        "_id": player_data.get("_id")
+    }, {
+        "score": score,
+    })
+
+@is_connected
+def add_score(username: str, score: int):
+    if is_exist_username(username):
+        update_score(username, score)
+        return
+
+    get_collection("playerdata").insert_one({
+        "player_name": username,
+        "score": score,
+    })
+
+@is_connected
+def delete_score(id_object: int):
+    if not id_object:
+        return
+
+    get_collection("playerdata").delete_one({
+        "_id": id_object
+    })
