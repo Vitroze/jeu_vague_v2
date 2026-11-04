@@ -1,5 +1,5 @@
 from .utils import request_option, request_string, request_number, request_bool
-from database.function import save_character
+from database.function import save_character, get_characters
 
 def send_request(question, type, min_value=None, default=None):
     match (type):
@@ -42,13 +42,23 @@ setup_character = [
     }
 ]
 
-def create_character():
+def send_setup(character=None):
     setup = {}
     for option in setup_character:
-        request = send_request(option.get("name"), option.get("type"), min_value=option.get("min"), default=option.get("default"))
+        request = send_request(option.get("name"), option.get("type"), min_value=option.get("min"), default=character is not None and character[option.get("key")] or option.get("default"))
         setup[option.get("key")] = request
+    return setup
 
+def create_character():
+    setup = send_setup()
     save_character(setup)
+
+def update_character():
+    id_character = request_option(get_characters())
+    character = get_characters()[id_character]
+
+    setup = send_setup(character)
+    save_character(setup, character.get("_id"))
 
 options = [
     {
@@ -57,7 +67,7 @@ options = [
     },
     {
         "name": "Modification d'un personnage",
-        "callback": None,
+        "callback": update_character,
     },
     {
         "name": "Supprimer un personnage",
