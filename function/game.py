@@ -8,13 +8,13 @@ def can_add_in_team(allies, name_team):
     return not allies.get("is_ennemy") and allies.get("name") not in name_team
 
 def generate_list_team(team):
-    name_team = [ allies.name for allies in team ]
-    allies = [
-        allies for allies in get_allies_in_db()
-        if can_add_in_team(allies, name_team)
+    name_team = [ available_character.name for available_character in team ]
+    available_character = [
+        available_character for available_character in get_allies_in_db()
+        if can_add_in_team(available_character, name_team)
     ]
 
-    return allies
+    return available_character
 
 def create_team():
     team = []
@@ -22,9 +22,9 @@ def create_team():
     while len(team) < MAX_TEAM:
         clear()
 
-        allies = generate_list_team(team)
-        id_character = request_option(allies)
-        character = Character.create_character(allies[id_character])
+        available_characters = generate_list_team(team)
+        id_character = request_option(available_characters)
+        character = Character.create_character(available_characters[id_character])
 
         team.append(character)
 
