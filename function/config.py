@@ -1,5 +1,5 @@
 from .utils import request_option, request_string, request_number, request_bool
-from database.function import save_character, get_characters
+from database.function import save_character, get_characters, delete_character as delete_character_db
 
 def send_request(question, type, min_value=None, default=None):
     match (type):
@@ -42,6 +42,16 @@ setup_character = [
     }
 ]
 
+def request_option_character()->dict:
+    id_character = request_option(get_characters())
+    try:
+        character = get_characters()[id_character]
+    except Exception:
+        print("Le personnage n'existe pas !")
+        return
+
+    return character
+
 def send_setup(character=None):
     setup = {}
     for option in setup_character:
@@ -54,11 +64,16 @@ def create_character():
     save_character(setup)
 
 def update_character():
-    id_character = request_option(get_characters())
-    character = get_characters()[id_character]
+    character = request_option_character()
 
     setup = send_setup(character)
     save_character(setup, character.get("_id"))
+
+def delete_character():
+    character = request_option_character()
+    confirm = request_bool("Êtes-vous sûre de supprimer le personnage ?")
+    if confirm:
+        delete_character_db(character.get("_id"))
 
 options = [
     {
@@ -71,7 +86,7 @@ options = [
     },
     {
         "name": "Supprimer un personnage",
-        "callback": None
+        "callback": delete_character,
     },
     # TODO: Make a config items
     {

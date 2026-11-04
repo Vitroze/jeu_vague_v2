@@ -52,6 +52,18 @@ def save_character(setup: dict, id_object: int = None):
     print(f"Vous avez crée le personnage : {setup.get("name")}")
 
 @is_connected
+def delete_character(id_object: int = None):
+    if not id_object:
+        print("Vous devez spécifié un id pour supprimer le personnage !")
+        return
+
+    get_collection("config").delete_one({
+        "_id": id_object,
+    })
+
+    print("Votre personnage a été supprimer !")
+
+@is_connected
 def get_ennemies_in_db():
     return list(get_collection("config").find({
         "is_ennemy": True,
