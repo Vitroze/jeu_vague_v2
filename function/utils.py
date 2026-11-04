@@ -1,5 +1,7 @@
 import os
 import inquirer
+import hashlib
+import hmac
 
 def clear():
     os.system("cls")
@@ -97,6 +99,41 @@ def request_bool(text:str, default=None):
 
     request_user = request_user.get("request")
     return request_user
+
+def transform_input_topassword(input:str, salt_hex, iteration):
+    input = hashlib.pbkdf2_hmac(
+        "sha256", input.encode("utf-8"), salt_hex, iteration
+    )
+
+    return input
+
+def request_password(text:str):
+    request_user = inquirer.prompt([
+        inquirer.Password("request", message=text)
+    ])
+
+    if request_user is None:
+        exit()
+
+    request_user = request_user.get("request")
+    if len(request_user) < 3:
+        print("why ?")
+        return request_password(text)
+
+    return request_user
+
+
+def password_is_correct(input:str, password:str):
+    iteration, salt_hex, key_hex = password.split("$")
+
+    iteration = int(iteration)
+    salt_hex = bytes.fromhex(salt_hex)
+    key_hex = bytes.fromhex(key_hex)
+
+    input = transform_input_topassword(input, salt_hex, iteration)
+
+    return hmac.compare_digest(key_hex, input)
+
 
 def clear_text(text: str)->str:
     """Mettre en minuscule, supprimer les espaces en trops"""
