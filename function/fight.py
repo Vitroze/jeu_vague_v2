@@ -1,4 +1,4 @@
-from .generator import generate_character
+from .generator import generate_character, random_list
 from .utils import clear
 from database.function import get_ennemies_in_db, add_score as add_score_db
 from meta.character import Character
@@ -10,9 +10,6 @@ def is_allies_alives(team):
 
 def get_allies_alives(team):
     return [allies for allies in team if allies.is_alive()]
-
-def random_list(team):
-    return choice(team)
 
 def start_fight(team):
     all_monsters = get_ennemies_in_db()
