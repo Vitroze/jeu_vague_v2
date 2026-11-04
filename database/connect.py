@@ -13,15 +13,6 @@ __CLIENT = None
 IS_CONNECT = False
 PRINT_TITLE = "Base de donnée"
 
-def __get_client__(client: list = []):
-    if client == []:
-        global __CLIENT
-
-        client.append(__CLIENT)
-        __CLIENT = None
-
-    return client[0]
-
 def show_no_connection():
     print_error(PRINT_TITLE, "La base de donnée n'est pas connecté")
 
@@ -69,7 +60,6 @@ def connect():
     client = DataBase.MongoClient(URL_MONGODB)
     __DB = client[DATABASE_NAME]
     __CLIENT = client
-    __get_client__()
 
     print_debug(PRINT_TITLE, "Tentative de connexion a la base de donnée.")
 
@@ -88,7 +78,7 @@ def connect():
     sleep(1)
 
 def disconnect():
-    client = __get_client__()
+    client = __CLIENT
     if client:
         client.close()
         print_success(PRINT_TITLE, "La base de donnée c'est bien déconnecté")
@@ -129,5 +119,3 @@ def get_database():
 def get_collection(name):
     name = f"{DATABASE_NAME}_{name}"
     return __DB[name]
-
-#print(get_collection("config"))
