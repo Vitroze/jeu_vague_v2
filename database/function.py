@@ -1,15 +1,17 @@
 from .connect import *
+from function.utils import clear_text
+import re
 
 def is_exist_character(name, ennemy:bool=None):
     return get_collection("config").find_one({
-        "name": name,
+        "name": re.compile(f"^{re.escape(name)}$", re.IGNORECASE),
         "is_ennemy": ennemy
     })
 
 
 def is_validate_data_character(fc):
     def callback(*args, **kwars):
-        if len(args) != 1:
+        if len(args) < 1 or type(args[0]) != dict:
             print("Merci de donner les données du personnage !")
             return
 
@@ -27,14 +29,24 @@ def is_validate_data_character(fc):
 
 @is_connected
 @is_validate_data_character
-def update_character(setup: dict):
-    pass
+def update_character(setup: dict, id_object: int):
+    get_collection("config").update_one({
+        "_id": id_object,
+    }, {
+        "$set": setup
+    })
+    print(f"Vous avez mise à jour le personnage !")
 
 @is_connected
 @is_validate_data_character
-def save_character(setup: dict):
-    if is_exist_character(setup.get("name")):
-        update_character(setup)
+def save_character(setup: dict, id_object: int = None):
+    if id_object:
+        update_character(setup, id_object)
+        return
+
+    if is_exist_character(clear_text(setup.get("name"))):
+        print("Votre personnage existe déjà !")
+        return
 
     get_collection("config").insert_one(setup)
     print(f"Vous avez crée le personnage : {setup.get("name")}")
@@ -50,3 +62,7 @@ def get_allies_in_db():
     return list(get_collection("config").find({
         "is_ennemy": False
     }))
+
+@is_connected
+def get_characters():
+    return list(get_collection("config").find())
