@@ -13,7 +13,6 @@
 #   Si la valeur est vrai alors on casse la boucle et on exécute la fonction
 #   Sinon on redemande
 
-from database.function import CharacterList, EnemyList, save_character
 from function.main_menu import show_menu
 from function.utils import clear
 from database.connect import connect as connect_db, disconnect as disconnect_db

@@ -34,6 +34,7 @@ def get_access_token():
     try:
         with open("token.txt", "r") as file:
             if decode_jwt(file.read()):
+                save_token(generate_token()) # Regenerate the token to extend its validity
                 return True
             return False
     except FileNotFoundError:
