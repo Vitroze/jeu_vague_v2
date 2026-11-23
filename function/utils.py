@@ -24,7 +24,7 @@ def request_option(choice: dict, key:str = None):
             max_height="100%",
         ).execute()
 
-        if choose is None:
+        if choose is None or choose == len(choice):
             raise UserQuit("Vous avez quitté pendant la sélection d'une option")
 
         return choose
