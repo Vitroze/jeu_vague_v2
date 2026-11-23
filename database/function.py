@@ -146,10 +146,11 @@ def is_validate_data_item(fc):
             return
 
         item = args[0]
-        if (not item.get("name")
-            or not item.get("power_attack")
-            or not item.get("power_defense")
-            or not item.get("durability")):
+
+        if ((not item.get("name") and item.get("name") == "")
+            or (not item.get("power_attack") and item.get("power_attack") < 0)
+            or (not item.get("power_defense") and item.get("power_defense") < 0)
+            or (not item.get("durability") and item.get("durability") <= 0)):
             print("Les données de l'item ne sont pas valides !")
             return
 

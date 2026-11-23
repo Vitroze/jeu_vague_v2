@@ -113,9 +113,9 @@ def request_option_character()->dict:
     return character
 
 @is_admin
-def send_setup(setup, default_value=None):
+def send_setup(setup_question, default_value=None):
     setup = {}
-    for option in setup:
+    for option in setup_question:
         request = send_request(option.get("name"), option.get("type"), min_value=option.get("min"), default=default_value is not None and default_value[option.get("key")] or option.get("default"))
         setup[option.get("key")] = request
     return setup
