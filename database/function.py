@@ -16,7 +16,7 @@ def is_exist_character(name, ennemy:bool=None):
 
 def is_validate_data_character(fc):
     def callback(*args, **kwars):
-        if len(args) < 1 or isinstance(args[0], dict):
+        if len(args) < 1 or not isinstance(args[0], dict):
             print("Merci de donner les données du personnage !")
             return
 
