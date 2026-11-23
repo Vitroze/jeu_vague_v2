@@ -1,35 +1,80 @@
-# Principe du jeu 
+# Principe du jeu
 Le joueur doit combattre une vague de monstre.
 
 # Fonctionnaltiés
 ## Notion de base de donnée
+
+Une liaison entre les tables est faite par l'ID de la table. Par exemple, si on veut savoir quel item est drop par un personnage, on va chercher dans la table ``Loot`` l'ID du personnage et on va récupérer l'ID de l'item qui est lié à ce personnage.
+
 Utilisation de MongoDB avec comme tables :
 - Score du joueur
 
-| Nom de la valeur | Type de donnée | Description |
-| :--- | :---: | :--- |
-| player_name | string | Nom du joueur |
-| score | uint | Score du joueur |
-| date | DATETIME | Date + heure du score réalisé |
+| Nom de la valeur | Type de donnée | Liaison | Description |
+| :--- | :---: | :--- | :--- |
+| player_name | string | N/A | Nom du joueur |
+| score | uint | N/A | Score du joueur |
+| date | DATETIME | N/A | Date + heure du score réalisé |
 
 - Characters
 
-| Nom de la valeur | Type de donnée | Description |
-| :--- | :---: | :--- |
-| name | string | Nom du personnage |
-| health | uint | Vie du personnage
-| power_attack | uint | Puissance d'attaque |
-| power_defense | uint | Puissance de défénse |
-| is_ennemy | bool | Est-ce un ennemi ? |
+| Nom de la valeur | Type de donnée | Liaison | Description |
+| :--- | :---: | :--- | :--- |
+| name | string | N/A | Nom du personnage |
+| health | uint | N/A | Vie du personnage
+| power_attack | uint | N/A | Puissance d'attaque |
+| power_defense | uint | N/A | Puissance de défénse |
+| is_ennemy | bool | N/A | Est-ce un ennemi ? |
+
+- Items
+
+| Nom de la valeur | Type de donnée | Liaison | Description |
+| :--- | :---: | :--- | :--- |
+| name | string | N/A | Nom de l'item |
+| power_attack | uint | N/A | Bonus d'attaque |
+| power_defense | uint | N/A | Bonus de défénse |
+| durability | uint | N/A | Durabilité de l'arme (se casse au bout de combien tours ?) |
+
+- Loot
+
+| Nom de la valeur | Type de donnée | Liaison | Description |
+| :--- | :---: | :--- | :--- |
+| character_id | uint | characters | ID du personnage |
+| item_id | uint | items | ID de l'item |
+| percentage | uint | N/A | Pourcentage de chance de drop l'item au moment de la mort (de 0 à 100) |
 
 - Inventory
 
+| Nom de la valeur | Type de donnée | Liaison | Description |
+| :--- | :---: | :--- | :--- |
+| player_id | uint | score | ID du joueur |
+| item_id | uint | items | ID de l'item |
+| durability | uint | N/A | Durabilité actuelle de l'item (se casse au bout de combien tours ?) |
+
+- Personnages en vie (Snapshot)
+
+| Nom de la valeur | Type de donnée | Liaison | Description |
+| :--- | :---: | :--- | :--- |
+| name_game_save | string | Partie sauvegardée | Nom de la partie sauvegardée |
+| player_id | uint | score | ID du joueur |
+| character_id | uint | characters | ID du personnage |
+| health | uint | N/A | Vie du personnage |
+
+- Partie sauvegardée
+
+| Nom de la valeur | Type de donnée | Liaison | Description |
+| :--- | :---: | :--- | :--- |
+| name_game_save | string | N/A | Nom de la partie sauvegardée |
+| player_id | uint | score | ID du joueur |
+| inventory_id | uint | Inventory | ID de l'inventaire (Inventaire actuel au moment de la sauvegarde) |
+
+<!-- - Inventory
+
 | Nom de la valeur | Type de donnée | Description |
 | :--- | :---: | :--- |
 | name | string | Nom du personnage |
 | power_attack | uint | Puissance d'attaque |
 | power_defense | uint | Puissance de défénse |
-| durability | uint | Durabilité de l'arme (se casse au bout de combien tours ?)
+| durability | uint | Durabilité de l'arme (se casse au bout de combien tours ?) -->
 
 ## Algorithme DB
 Au lancement du programme.
