@@ -2,31 +2,32 @@ import os
 import inquirer
 import hashlib
 import hmac
+from InquirerPy import inquirer as InquirerPy
+from InquirerPy.base import Choice
 from meta.exceptions import UserQuit
 
 def clear():
     os.system("cls")
 
 def convert_option(choice: dict, key:str = None) -> list:
-    choice = [(option.get(key is not None and key or "name"), index) for index, option in enumerate(choice)]
-    choice.append(("Quitter", len(choice) + 1))
-    return choice
+    choice_list = [Choice(value=index, name=option.get(key is not None and key or "name")) for index, option in enumerate(choice)]
+    choice_list.append(Choice(value=len(choice), name="Quitter"))
+    return choice_list
 
 def request_option(choice: dict, key:str = None):
     while True:
         option_list = convert_option(choice, key)
-        choose = inquirer.prompt([
-            inquirer.List(
-                "id",
-                message = "Quel option souhaitez-vous choisir ?",
-                choices=option_list
-            )
-        ])
+        choose = InquirerPy.fuzzy(
+            message = "Quel option souhaitez-vous choisir ?",
+            choices=option_list,
+            instruction="Tapez le nom de l'option ou utilisez les flèches pour naviguer",
+            max_height="100%",
+        ).execute()
 
-        if choose is None or choose.get("id") == len(option_list):
+        if choose is None:
             raise UserQuit("Vous avez quitté pendant la sélection d'une option")
 
-        return choose.get("id")
+        return choose
 
 def is_number(number: str) -> bool:
     return number.isdigit()
