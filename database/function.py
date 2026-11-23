@@ -134,3 +134,31 @@ def delete_score(id_object: int):
     get_collection("playerdata").delete_one({
         "_id": id_object
     })
+
+# A temporary code that, in the event of a database reset, restores the default data for testing purposes.
+
+# CharacterList = [
+#     {"name" : "Guerrier", "health" : 100, "power_defense" : 10, "power_attack" : 15 },
+#     {"name": "Mage", "health" : 80, "power_defense": 5, "power_attack" : 20 },
+#     {"name" : "Archer", "health" : 90, "power_defense": 7, "power_attack" : 18},
+#     {"name" : "Voleur", "health" : 85, "power_defense": 8, "power_attack" : 22},
+#     {"name" : "Paladin", "health" : 110, "power_defense": 12, "power_attack" : 14},
+#     {"name" : "Sorcier", "health" : 70, "power_defense": 3, "power_attack" : 25},
+#     {"name" : "Chevalier", "health" : 120,"power_defense": 15, "power_attack" : 17},
+#     {"name" : "Moine", "health" : 95, "power_defense": 9, "power_attack" : 19 },
+#     {"name" : "Berserker", "health" : 105, "power_defense": 6, "power_attack" : 23},
+#     {"name" : "Chasseur", "health" : 100, "power_defense": 11, "power_attack" : 16}
+# ]
+
+# EnemyList = [
+#     {"name" : "Goblin", "health" : 50, "power_defense" : 5, "power_attack" : 10},
+#     {"name" : "Orc", "health" : 120, "power_defense": 8, "power_attack" : 20 },
+#     {"name" : "Dragon", "health" : 300, "power_defense": 20, "power_attack" : 35 },
+#     {"name" : "Zombie", "health" : 70, "power_defense": 6, "power_attack" : 12 },
+#     {"name" : "Troll", "health" : 200, "power_defense": 15, "power_attack" : 25},
+#     {"name" : "Spectre",  "health" : 100, "power_defense": 10, "power_attack" : 18},
+#     {"name" : "Golem", "health" : 250, "power_defense": 25, "power_attack" : 30 },
+#     {"name" : "Vampire", "health" : 150, "power_defense": 12, "power_attack" : 22 },
+#     {"name" : "Loup-Garou", "health" : 180, "power_defense": 18, "power_attack" : 28 },
+#     {"name" : "Squelette", "health" : 90, "power_defense": 7, "power_attack" : 15 }
+# ]
