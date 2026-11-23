@@ -27,10 +27,8 @@ def decode_jwt(token:str):
     try:
         payload = jwt.decode(token, os.getenv("SECRET_KEY_PAYLOAD"), algorithms=METHOD_TOKEN)
     except jwt.ExpiredSignatureError:
-        print("Token expiré !")
         return False
     except jwt.InvalidTokenError:
-        print("Token invalide")
         return False
     return payload
 
@@ -49,10 +47,7 @@ def is_admin(fc):
         if get_access_token():
             return fc(*args, **kwars)
 
-        password = request_password("Veuillez rentrer le mot de passe de l'admin")
-        if not password_is_correct(password, os.getenv("ADMIN_PASSWORD")):
-            print("MOT DE PASSE INCORRECTE")
-            return
+        request_password("Veuillez rentrer le mot de passe de l'admin", os.getenv("ADMIN_PASSWORD"))
 
         save_token(generate_token())
         return fc(*args, **kwars)

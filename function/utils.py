@@ -105,7 +105,7 @@ def transform_input_topassword(input_user:str, salt_hex, iteration):
 
     return input_user
 
-def request_password(text:str):
+def request_password(text:str, correct_password:str = None):
     request_user = inquirer.prompt([
         inquirer.Password("request", message=text)
     ])
@@ -115,7 +115,11 @@ def request_password(text:str):
 
     request_user = request_user.get("request")
     if len(request_user) < 3:
-        return request_password(text)
+        return request_password(text, correct_password)
+
+    if not password_is_correct(request_user, correct_password):
+        print("MOT DE PASSE INCORRECTE")
+        return request_password(text, correct_password)
 
     return request_user
 
