@@ -4,7 +4,7 @@ import hashlib
 import hmac
 from InquirerPy import inquirer as InquirerPy
 from InquirerPy.base import Choice
-from meta.exceptions import UserQuit
+from models.exceptions import UserQuit
 
 def clear():
     os.system("cls")

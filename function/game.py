@@ -1,6 +1,6 @@
 from .utils import clear, request_option, request_string
 from .fight import fight
-from meta.character import Character
+from models.character import Character
 from database.function import get_allies_in_db
 MAX_TEAM = 2
 

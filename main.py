@@ -16,7 +16,7 @@
 from function.main_menu import show_menu
 from function.utils import clear
 from database.connect import connect as connect_db, disconnect as disconnect_db
-from meta.exceptions import UserQuit, ErrorDataBase
+from models.exceptions import UserQuit, ErrorDataBase
 
 def main():
     clear()

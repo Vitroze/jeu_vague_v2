@@ -1,4 +1,4 @@
-from meta.character import Character
+from models.character import Character
 from function.utils import is_valid_list
 from random import choice
 

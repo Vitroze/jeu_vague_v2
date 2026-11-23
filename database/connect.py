@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 from function.logger import print_success, print_debug, print_error
-from meta.exceptions import ErrorDataBase
+from models.exceptions import ErrorDataBase
 from time import sleep
 import pymongo as DataBase
 import os

@@ -1,7 +1,7 @@
 from .generator import generate_character, random_list
 from .utils import clear
 from database.function import get_ennemies_in_db, add_score as add_score_db
-from meta.character import Character
+from models.character import Character
 from time import sleep
 from random import choice
 
