@@ -135,6 +135,54 @@ def delete_score(id_object: int):
         "_id": id_object
     })
 
+@is_connected
+def get_items():
+    return list(get_collection("items").find())
+
+def is_validate_data_item(fc):
+    def callback(*args, **kwars):
+        if len(args) < 1 or not isinstance(args[0], dict):
+            print("Merci de donner les données de l'item !")
+            return
+
+        item = args[0]
+        if (not item.get("name")
+            or not item.get("power_attack")
+            or not item.get("power_defense")
+            or not item.get("durability")):
+            print("Les données de l'item ne sont pas valides !")
+            return
+
+        return fc(*args, **kwars)
+    return callback
+
+@is_connected
+@is_validate_data_item
+def save_item(setup: dict, id_object: int = None):
+    if id_object:
+        get_collection("items").update_one({
+            "_id": id_object,
+        }, {
+            "$set": setup
+        })
+        print("Vous avez mise à jour l'item !")
+        return
+
+    get_collection("items").insert_one(setup)
+    print(f"Vous avez crée l'item : {setup.get("name")}")
+
+@is_connected
+def delete_item(id_object: int = None):
+    if not id_object:
+        print("Vous devez spécifié un id pour supprimer l'item !")
+        return
+
+    get_collection("items").delete_one({
+        "_id": id_object,
+    })
+
+    print("Votre item a été supprimer !")
+
 # A temporary code that, in the event of a database reset, restores the default data for testing purposes.
 
 # CharacterList = [

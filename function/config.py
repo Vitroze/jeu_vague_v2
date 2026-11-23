@@ -1,5 +1,9 @@
 from .utils import request_option, request_string, request_number, request_bool, request_password, password_is_correct
-from database.function import save_character, get_characters, delete_character as delete_character_db, get_scores, delete_score as delete_score_db
+from database.function import (
+    save_character, get_characters, delete_character as delete_character_db,
+    get_scores, delete_score as delete_score_db,
+    save_item, get_items, delete_item as delete_item_db
+)
 from datetime import datetime, timezone, timedelta
 import os
 import jwt
@@ -109,23 +113,23 @@ def request_option_character()->dict:
     return character
 
 @is_admin
-def send_setup(character=None):
+def send_setup(setup, default_value=None):
     setup = {}
-    for option in setup_character:
-        request = send_request(option.get("name"), option.get("type"), min_value=option.get("min"), default=character is not None and character[option.get("key")] or option.get("default"))
+    for option in setup:
+        request = send_request(option.get("name"), option.get("type"), min_value=option.get("min"), default=default_value is not None and default_value[option.get("key")] or option.get("default"))
         setup[option.get("key")] = request
     return setup
 
 @is_admin
 def create_character():
-    setup = send_setup()
+    setup = send_setup(setup_character)
     save_character(setup)
 
 @is_admin
 def update_character():
     character = request_option_character()
 
-    setup = send_setup(character)
+    setup = send_setup(setup_character, character)
     save_character(setup, character.get("_id"))
 
 @is_admin
@@ -144,6 +148,59 @@ def delete_score():
     if confirm:
         delete_score_db(score.get("_id"))
 
+setup_item = [
+    {
+        "name": "Nom de l'item",
+        "type": "str",
+        "key": "name"
+    },
+    {
+        "name": "Bonus d'attaque",
+        "type": "uint",
+        "key": "power_attack"
+    },
+    {
+        "name": "Bonus de défense",
+        "type": "uint",
+        "key": "power_defense"
+    },
+    {
+        "name": "Durabilité",
+        "type": "uint",
+        "key": "durability"
+    }
+]
+
+@is_admin
+def request_option_item()->dict:
+    id_item = request_option(get_items())
+    try:
+        item = get_items()[id_item]
+    except Exception:
+        print("L'item n'existe pas !")
+        return {}
+
+    return item
+
+@is_admin
+def create_item():
+    setup = send_setup(setup_item)
+    save_item(setup)
+
+@is_admin
+def update_item():
+    item = request_option_item()
+
+    setup = send_setup(setup_item, item)
+    save_item(setup, item.get("_id"))
+
+@is_admin
+def delete_item():
+    item = request_option_item()
+    confirm = request_bool("Êtes-vous sûre de supprimer l'item ?")
+    if confirm:
+        delete_item_db(item.get("_id"))
+
 options = [
     {
         "name": "Création d'un personnage",
@@ -156,6 +213,18 @@ options = [
     {
         "name": "Supprimer un personnage",
         "callback": delete_character,
+    },
+    {
+        "name": "Création d'un item",
+        "callback": create_item,
+    },
+    {
+        "name": "Modification d'un item",
+        "callback": update_item,
+    },
+    {
+        "name": "Supprimer un item",
+        "callback": delete_item,
     },
     # TODO: Make a config items
     {
