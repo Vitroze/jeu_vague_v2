@@ -16,11 +16,13 @@
 from function.main_menu import show_menu
 from function.utils import clear
 from database.connect import connect as connect_db, disconnect as disconnect_db
+from database.init import initialize_database
 from models.exceptions import UserQuit, ErrorDataBase
 
 def main():
     clear()
     connect_db()
+    initialize_database()
 
     # A temporary code that, in the event of a database reset, restores the default data for testing purposes.
 

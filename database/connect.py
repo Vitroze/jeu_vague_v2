@@ -108,8 +108,12 @@ def create_table(name, collection_list):
 @is_connected
 def create_tables(collection_list):
     create_table("config", collection_list)
-    create_table("playerdata", collection_list)
+    create_table("scores", collection_list)
+    create_table("difficulty", collection_list)
+    create_table("vagues", collection_list)
     create_table("items", collection_list)
+    create_table("rarities", collection_list)
+    create_table("saves", collection_list)
 
 @is_connected
 def get_database():
