@@ -1,9 +1,11 @@
 from dataclasses import dataclass
+from function.utils import clamp
 
 @dataclass
 class Character():
     name: str
     health: int
+    max_health: int = health
     power_attack: int
     power_defense: int
     is_ennemy: bool = False
@@ -50,4 +52,14 @@ class Character():
         )
 
     def heal(self, amount: int):
-        self.health += amount
+        self.health = clamp(self.health + amount, 0, self.max_health)
+
+class Enemy(Character):
+    def __init__(self, name: str, health: int, power_attack: int, power_defense: int, dropable: list):
+        super().__init__(name, health, power_attack, power_defense, is_ennemy=True)
+        self.dropable = dropable
+
+    # Pour chaque item dropapble, on va faire un lancé. Un ennemi peut dropper plusieurs items, mais pas forcément tous. On va donc faire un lancé pour chaque item. Si le lancé est réussi, on ajoute l'item à la liste des items dropés. On retourne ensuite cette liste.
+    def drop_loot(self):
+       # return self.dropable
+       pass
