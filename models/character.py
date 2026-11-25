@@ -31,6 +31,7 @@ class Character():
 
     def is_death(self):
         return self.health <= 0
+
     @classmethod
     def is_valid_values_for_character(cls, dict_character: dict)->bool:
         return dict_character.get("name") and dict_character.get("health") and dict_character.get("power_attack") and dict_character.get("power_defense")
@@ -47,3 +48,6 @@ class Character():
             info_character["power_defense"],
             info_character.get("is_ennemy"),
         )
+
+    def heal(self, amount: int):
+        self.health += amount
