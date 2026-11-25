@@ -2,7 +2,6 @@ from .utils import clear, request_option, request_string
 from .fight import fight
 from models.character import Character
 from database.function import get_allies_in_db
-MAX_TEAM = 2
 
 def can_add_in_team(allies, name_team):
     return not allies.get("is_ennemy") and allies.get("name") not in name_team
