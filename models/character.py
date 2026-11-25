@@ -22,11 +22,13 @@ class Character():
         new_health = self.health - power_attack
         self.set_health(new_health)
 
-        # TODO: Refaire l'affichage dans des fonctions séparés
-        print(f"{self.name} a subit {power_attack} de dégâts de la part de {other_character.name}")
+        return power_attack
 
-        if new_health < 1:
-            print(f"{self.name} est mort !")
+        # TODO: Refaire l'affichage dans des fonctions séparés
+        # print(f"{self.name} a subit {power_attack} de dégâts de la part de {other_character.name}")
+
+        # if new_health < 1:
+        #     print(f"{self.name} est mort !")
 
     def is_alive(self):
         return self.health > 0
