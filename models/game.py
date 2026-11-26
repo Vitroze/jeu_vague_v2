@@ -26,8 +26,6 @@ class Game:
         inventaire (in itemsavedb)
         """
 
-        print(self.player, self.player.name, self.player.score, self.player.characters, self.vague.ennemies, self.player.inventory)
-
         save_game_db(
             player_name=self.player.name,
             score=self.player.score,
