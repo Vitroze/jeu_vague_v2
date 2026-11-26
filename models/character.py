@@ -22,6 +22,16 @@ class Entity:
     def get_defense_power(self):
         return self.power_defense
 
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "health": self.health,
+            "max_health": self.max_health,
+            "power_attack": self.power_attack,
+            "power_defense": self.power_defense,
+            "is_ennemy": self.is_ennemy
+        }
+
     def take_damage(self, other_character):
         power_attack = other_character.get_attack_power() - self.get_defense_power()
         power_attack = max(2, power_attack)
@@ -29,8 +39,14 @@ class Entity:
         new_health = self.health - power_attack
         self.set_health(new_health)
 
-        print(f"{self.name} a subit {power_attack} de dégâts de la part de {other_character.name} (PV restant : {self.health}/{self.max_health})")
-        return power_attack
+        if new_health < 1:
+            return {"message": f"{self.name} a été vaincu par {other_character.name} !"}
+
+        return {"message": f"{other_character.name} inflige {power_attack} degats a {self.name}"}
+        #if new_health < 1:
+        #    return f"{self.name} a été vaincu par {other_character.name} !"
+
+        #return f"{self.name} a subi {power_attack} points de dégâts de la part de {other_character.name}. Il lui reste {self.health} points de vie."        
 
         # TODO: Refaire l'affichage dans des fonctions séparés
 
