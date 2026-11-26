@@ -1,8 +1,9 @@
+from abc import ABC, abstractmethod
 from function.utils import clamp
 from models.item import Equipable
 from typing import List
 
-class Entity:
+class Entity(ABC):
     def __init__(self, name: str, health: int, power_attack: int, power_defense: int, is_ennemy: bool = False):
         self.name = name
         self.health = health
@@ -32,23 +33,25 @@ class Entity:
             "is_ennemy": self.is_ennemy
         }
 
-    def take_damage(self, other_character):
-        power_attack = other_character.get_attack_power() - self.get_defense_power()
+    def take_damage(self, amount: int):
+        self.set_health(self.heath - amount)
+        return amount
+        # power_attack = other_character.get_attack_power() - self.get_defense_power()
+        # power_attack = max(2, power_attack)
+
+        # new_health = self.health - power_attack
+        # self.set_health(new_health)
+
+        # if new_health < 1:
+        #     return {"message": f"{self.name} a été vaincu par {other_character.name} !"}
+
+        # return {"message": f"{other_character.name} inflige {power_attack} degats a {self.name}"}
+
+    def attack(self, target: "Entity"):
+        power_attack = self.get_attack_power() - target.get_defense_power()
         power_attack = max(2, power_attack)
 
-        new_health = self.health - power_attack
-        self.set_health(new_health)
-
-        if new_health < 1:
-            return {"message": f"{self.name} a été vaincu par {other_character.name} !"}
-
-        return {"message": f"{other_character.name} inflige {power_attack} degats a {self.name}"}
-        #if new_health < 1:
-        #    return f"{self.name} a été vaincu par {other_character.name} !"
-
-        #return f"{self.name} a subi {power_attack} points de dégâts de la part de {other_character.name}. Il lui reste {self.health} points de vie."        
-
-        # TODO: Refaire l'affichage dans des fonctions séparés
+        return target.take_damage(power_attack)
 
     def is_alive(self):
         return self.health > 0
@@ -76,22 +79,36 @@ class Entity:
     def heal(self, amount: int):
         self.health = clamp(self.health + amount, 0, self.max_health)
 
+    @abstractmethod
     def play_turn(self):
-        if not self.target:
+        """UML: Play a turn for the entity. This method should be implemented by subclasses."""
+        # if not self.target:
+        #     return None
+
+        # attack = self.target.take_damage(self)
+        # return attack
+
+    def attack_target(self):
+        target = self.target
+        if not target:
             return None
 
-        attack = self.target.take_damage(self)
+        attack = target.take_damage(self)
         return attack
-
-class Character(Entity):
-    def __init__(self, name: str, health: int, power_attack: int, power_defense: int):
-        super().__init__(name, health, power_attack, power_defense, is_ennemy=False)
-        self.equipments: List[Equipable] = []
 
     @classmethod
     def create_character(cls, info_character: dict):
         if not Entity.is_valid_values_for_character(info_character):
             return None
+
+        if info_character.get("is_ennemy"):
+            return Enemy(
+                info_character["name"],
+                info_character["health"],
+                info_character["power_attack"],
+                info_character["power_defense"],
+                info_character.get("dropable", []),
+            )
 
         return Character(
             info_character["name"],
@@ -99,6 +116,11 @@ class Character(Entity):
             info_character["power_attack"],
             info_character["power_defense"],
         )
+
+class Character(Entity):
+    def __init__(self, name: str, health: int, power_attack: int, power_defense: int):
+        super().__init__(name, health, power_attack, power_defense, is_ennemy=False)
+        self.equipments: List[Equipable] = []
 
     def get_attack_power(self):
         total_attack_power = self.power_attack
@@ -124,11 +146,12 @@ class Character(Entity):
 
     def equip_item(self, item: Equipable):
         if  not self.is_slot_available(item.slot):
-            print(f"Le slot {item.slot} est déjà occupé par un autre équipement.")
             return False
 
         self.equipments.append(item)
         self.max_health += item.get_health_bonus()
+
+        return True
 
     def unequip_item(self, item: Equipable):
         if item in self.equipments:
@@ -136,14 +159,20 @@ class Character(Entity):
             self.max_health -= item.get_health_bonus()
             self.health = min(self.health, self.max_health)
 
+    def play_turn(self):
+        return self.attack_target()
+
 class Enemy(Entity):
     def __init__(self, name: str, health: int, power_attack: int, power_defense: int, dropable: list):
         super().__init__(name, health, power_attack, power_defense, is_ennemy=True)
         self.dropable = dropable
 
-    def drop_loot(self) -> list:
+    def drop_loot(self, multiplier: float = 1.0) -> list:
         dropped_items = []
         for item in self.dropable:
-            if item.roll_drop():
+            if item.roll_drop(multiplier):
                 dropped_items.append(item)
         return dropped_items
+
+    def play_turn(self):
+        return self.attack_target()
