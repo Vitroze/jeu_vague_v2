@@ -1,152 +1,146 @@
+import builtins
 from time import sleep
+import enum
+import pymongo
+import os
+import random
 
 from rich.console import Console
+from rich.panel import Panel
+from rich.columns import Columns
 from rich.align import Align
-import copy
-import os
-from random import random
-from pymongo import MongoClient
-from random import choice
-from rich.layout import Layout
-LAYOUT = Layout()
-console = Console()
-
-TAILLE_MAX_EQUIPE = 3
-MENU = ["Jouer", "Leaderboard", "Quitter"]
-LAYOUT.split_row(
-    Layout(name="left", ratio=2),
-    Layout(name="center", ratio=3),  # Le centre sera 3 fois plus grand
-    Layout(name="right", ratio=2)   # La droite sera 2 fois plus grande
-)
 
 
-def create_panel(title="", text="", color="yellow"):
-	from rich.panel import Panel
+TEAM_SIZE = 3
 
-	text_color = {"red": {"start": "[red]", "end": "[/red]"},
-               "green": {"start": "[green]", "end": "[/green]"},
-               "blue": {"start": "[blue]", "end": "[/blue]"},
-               "yellow": {"start": "[yellow]", "end": "[/yellow]"}
-               }
+TOP_SCORES_COUNT = 3
 
-	return Panel(Align.center(text_color[color]["start"] + text + text_color[color]["end"], vertical="middle"), title=title, border_style=color)
-
-	# CHOIX DU MENU
-	# 	liste d'options = MENU
-	# 	message = "Veuillez choisir une option :"
-	# 	recuperer le choix utilisateur valide depuis une liste d'options
-	# 	retourner le choix
-	# Lancer processus
-	# 	1 - Jeu
-	# 	2 - Leaderboard
-	# 	3 - Quitter
-
-	# 1 - Jeu
-	# ouvrir une connexion a la db
-	# demander un pseudo utilisateur
-	# recuperer la liste des heros selectionnables
-	# creer une equipe
-	# lancer le combat a mort
-	# enregistrer le resultat du combat
-
-	# Recuperer le choix utilisateur valide depuis une liste d'options (options, message)
-	# 	tant que infini
-	# 		Afficher les options disponibles
-	# 		demander un input (message)
-	# 		verifier la validite du choix (choix, 1, len(options))
-	# 		si choix valide
-	# 			retourner le choix
-	#
-
-	# Valider un choix utilisateur (choix, minimum, maximum)
-	# 	si pas choix.isdigit()
-	# 		retourner False
-	# 	converti le choix en entier
-	# 	si choix < minimum ou choix > maximum
-	# 		retourner False
-	# 	retourner True
-
-	# lancer le combat a mort
-	# 	vague = 1
-	# 	tant que equipe est en vie
-	# 		selectionner un monstre pour la vague
-	# 		victoire = lancer la vague
-	# 		si victoire
-	# 			afficher un message de victoire pour la vague
-	# 			vague = vague + 1
-
-	# lancer la vague
-	# 	tant que monstre est en vie et equipe est en vie
-	# 		evenements = tour de vague
-	# 		afficher les evenements du tour
-	# 	retourne equipe est en vie
-
-	# afficher les evenements du tour
-	# 	pour chaque evenement dans la liste des evenements
-	# 		afficher l'evenement
-	# 	afficher un separateur pour distinguer les tours
+# _print = builtins.print
 
 
-def choix_menu():
-	# Recuperer le choix utilisateur valide depuis la liste MENU
-	message = "Veuillez choisir une option :"
-	return get_user_choice_from_options(MENU, message)
+# def print(*args, **kwargs):
+# _print(*args, **kwargs)
+# sleep(0.5)
 
 
-def lancer_processus(choix):
-	if choix == 1:
-		lancer_jeu()
-		pass
-	elif choix == 2:
-		# Afficher le leaderboard
-		pass
-	elif choix == 3:
-		# Quitter le programme
-		pass
+# Ouvrir DB
+
+# BOUCLE INFINI
+# 	Faire choisir utilisateur
+# 		recuperer un choix valide (message, options, erreur)
+# 			tant que INFINI
+# 				Afficher les options
+# 				demander un choix
+# 				si choix est valid
+# 					renvoyer le choix
+# 				erreur()
+# 			Validite:
+# 				verifier que le choix est un entier
+# 				verifier que le choix est dans un interval
+
+class Joueur:
+	def __init__(self, name):
+		self.name = name
+		self.waves = 0
+		self.actual_wave = 0
+
+	def to_db_score(self):
+		return {"player_name": self.name, "waves": self.waves}
 
 
-def main():
-	choix = choix_menu()
-	lancer_processus(choix)
+def afficher_score(joueur):
+	print(f"Score de {joueur.name}: {joueur.waves}")
 
 
-def afficher_game_over(equipe, score):
-	print("Game Over !")
-	print(f"Votre équipe a survécu à {score} vagues.")
-	print("Statut final de l'équipe :")
-	for hero in equipe:
-		print(f"{hero['name']} - HP: {hero['hp']}")
+def creer_joueur(db):
+	nom_joueur = recuperer_nom_valide(db)
+
+	return Joueur(nom_joueur)
 
 
-def lancer_jeu():
-	db = connect_db()
-	pseudo = get_username(db)
-	heros_disponibles = recuperer_all_heroes(db)
-	monstres = recuperer_all_monsters(db)
-	equipe = create_team(heros_disponibles)
-	score = combat_a_mort(equipe, monstres)
-	afficher_game_over(equipe, score)
-	enregistrer_resultat_combat(db, pseudo, score)
+def recuperer_nom_valide(db):
+	while True:
+		nom = input("Entrez le nom du joueur: ")
+		nom = nom.strip()
+		if est_nom_valide(nom, db):
+			return nom
+		print("Nom invalide ou déjà utilisé, veuillez réessayer.")
 
 
-def enregistrer_resultat_combat(db, pseudo, score):
-	db["scores"].insert_one({
-		"player_name": pseudo,
-		"waves": score
-	})
+def est_nom_valide(nom, db):
+	if len(nom) < 3 or len(nom) > 20:
+		return False
+	if not est_nom_unique(nom, db):
+		return False
+	return True
 
 
-def recuperer_all_heroes(db):
+def est_nom_unique(nom, db):
+	if db["scores"].find_one({"player_name": nom}):
+		return False
+	return True
+
+
+# 				Creer une equipe
+# 					recuperer perso depuis la DB
+# 					Boucle tant que l'equipe n'est pas complete
+# 						Afficher equipe
+# 						creer la liste des persos dispo (persos, team)
+# 						recuperer un choix valide (persos dispos)
+# 						Ajouter le perso choisi a l'equipe
+def creer_equipe(db):
+	persos_db = recuperer_persos_db(db)
+	equipe = []
+	while not est_equipe_complete(equipe):
+		# afficher_equipe(equipe)
+		persos_dispo = creer_liste_persos_dispo(persos_db, equipe)
+		choix = get_perso_choice(persos_dispo)
+		equipe.append(persos_dispo[choix - 1])
+	return equipe
+
+
+def creer_liste_persos_dispo(persos_db, equipe):
+	persos_dispo = persos_db.copy()
+	for perso in equipe:
+		if perso in persos_dispo:
+			persos_dispo.remove(perso)
+	return persos_dispo
+
+
+def afficher_equipe(equipe):
+	for i in range(TEAM_SIZE):
+		if i < len(equipe):
+			print(f"{i + 1}. {create_perso_message(equipe[i])}")
+		else:
+			print(f"{i + 1}. [Vide]")
+
+
+def est_equipe_complete(equipe):
+	return len(equipe) >= TEAM_SIZE
+
+
+def recuperer_persos_db(db):
 	return list(db["characters"].find())
 
 
-def recuperer_all_monsters(db):
+def create_perso_message(perso):
+	return f"{perso['name']} - ATK : {perso['attack']} - HP : {perso['hp']} - DEF : {perso['defense']}"
+
+
+def create_persos_message(persos):
+	message = "Choisissez un perso parmi les suivants:"
+	return message
+
+
+def get_perso_choice(persos):
+	message = create_persos_message(persos)
+	persos_choice = [create_perso_message(perso) for perso in persos]
+	choice = get_valid_choice(message, persos_choice, error_message_choice)
+	return choice
+
+
+def recuperer_monstres_db(db):
 	return list(db["monsters"].find())
-
-
-def connect_db():
-	client = MongoClient(os.getenv("MONGO_URL"))
-	return client["game_db"]
 
 
 def est_entite_en_vie(entite):
@@ -154,434 +148,309 @@ def est_entite_en_vie(entite):
 
 
 def est_equipe_en_vie(equipe):
-	for hero in equipe:
-		if est_entite_en_vie(hero):
+	for membre in equipe:
+		if est_entite_en_vie(membre):
 			return True
 	return False
 
 
-def selectionner_monstre(monstres):
-	monstre_choice = choice(monstres)
-	return copy.deepcopy(monstre_choice)
+def selectionner_monstre_aleatoire(monstres):
+	import random
+	return random.choice(monstres)
 
 
-def combat_a_mort(equipe, monstres):
-	vague = 1
-	while est_equipe_en_vie(equipe):
-		monstre = selectionner_monstre(monstres)
-		victoire = lancer_vague(equipe, monstre)
-		if victoire:
-			print(f"Victoire pour la vague {vague} !")
-			vague += 1
-	return vague
+# lancer vague (equipe, monstre)
+# 	Boucle tant que monstre et equipe sont en vie
+# 		recuperer liste des membres de l'equipe en vie
+# 		equipe attaque monstre
+# 			Pour chaque membre de l'equipe en vie
+# 				attaque monstre
+# 		monstre attaque equipe
+# 			selectionner une cible
+# 			attaquer cible
+# 		afficher les evenements du tour
+# 			Afficher Etat des entites
+# 				Afficher equipe
+# 				Afficher Monstre
+# 			Affiche les evenements
+# 			Afficher Etat des entites
+# 	retourner est equipe en vie ?
+
+def recuperer_membres_en_vie(equipe):
+	membres_en_vie = []
+	for membre in equipe:
+		if est_entite_en_vie(membre):
+			membres_en_vie.append(membre)
+	return membres_en_vie
 
 
-def lancer_vague(equipe, monstre):
+def equipe_attaque_monstre(membres_en_vie, monstre):
+	evenements = []
+	for membre in membres_en_vie:
+		if est_entite_en_vie(monstre):
+			evenements.append({"message": infliger_degats(membre, monstre),
+			                  "team": copy_team(membres_en_vie), "monster": copy_entity(monstre)})
+	return evenements
+
+
+def choose_target_in_team(equipe):
+	return random.choice(equipe)
+
+
+def infliger_degats(atk, defn):
+	degats = max(atk["attack"] - defn["defense"], 1)
+	defn["hp"] = max(defn["hp"] - degats, 0)
+	return f"{atk['name']} inflige {degats} degats a {defn['name']}"
+
+
+def copy_entity(entite):
+	import copy
+	return copy.deepcopy(entite)
+
+
+def copy_team(equipe):
+	return [copy_entity(membre) for membre in equipe]
+
+
+def monstre_attaque_equipe(monstre, equipe):
+	evenements = []
+	if not est_entite_en_vie(monstre):
+		return []
+	membres_en_vie = recuperer_membres_en_vie(equipe)
+	target = choose_target_in_team(membres_en_vie)
+	evenements.append({"message": infliger_degats(monstre, target),
+	                  "monster": copy_entity(monstre), "team": copy_team(equipe)})
+	return evenements
+
+
+def lancer_vague(joueur, equipe, monstre):
 	while est_entite_en_vie(monstre) and est_equipe_en_vie(equipe):
-		evenements = tour_de_vague(equipe, monstre)
-		afficher_evenements(evenements, equipe, monstre)
-		sleep(1)
+		# TODO: Affichage RICH
+		evenements = []
+
+		membres_en_vie = recuperer_membres_en_vie(equipe)
+
+		evenements += equipe_attaque_monstre(membres_en_vie, monstre)
+		evenements += monstre_attaque_equipe(monstre, equipe)
+
+		afficher_evenements(joueur, evenements)
+
+		# input("")
+
 	return est_equipe_en_vie(equipe)
 
 
-def update_layout(equipePanel, monstrePanel, info_panel):
-	global LAYOUT
-	LAYOUT["left"].update(equipePanel)
-	LAYOUT["right"].update(monstrePanel)
-	LAYOUT["center"].update(info_panel)
+def creer_titre_tour(player):
+	Title = f"Tour de {player.name} - Vague {player.actual_wave}"
+	en_tete = Panel(
+		Align.center(Title, style=f"bold blue"),
+		border_style="blue"
+	)
+	return en_tete
 
 
-def afficher_evenements(evenements, equipe, monstre):
-	console.clear()
-	print("\n\n")
-
-	equipePanel = create_panel("Equipe", "\n".join(
-		[f"{hero['name']} - HP: {hero['hp']}" for hero in equipe]), "green")
-	monstrePanel = create_panel(
-		"Monstre", f"{monstre['name']} - HP: {monstre['hp']}", "red")
-	info_panel = create_panel("Evenements", "\n".join(evenements), "yellow")
-
-	update_layout(equipePanel, monstrePanel, info_panel)
-
-	console.print(LAYOUT, height=10)
+def creer_text_equipe(equipe):
+	return "\n".join([f"{membre['name']} - HP: {membre['hp']}" for membre in equipe])
 
 
-def afficher_stats(equipe, monstre):
-	print("-" * 10 + " Stats " + "-" * 10)
-	print("Stats de l'equipe :")
-	for hero in equipe:
-		if not est_entite_en_vie(hero):
-			print(f"{hero['name']} est KO")
-			continue
-		print(f"{hero['name']} - HP: {hero['hp']}")
-	print("Stats du monstre :")
-	print(f"{monstre['name']} - HP: {monstre['hp']}")
-	print("-" * 30)
-
-# affiche les stats de l'equipe et du monstre
-# 	afficher "Stats de l'equipe :"
-# 	pour chaque hero dans l'equipe
-# 		afficher le nom du hero et ses points de vie
-# 	afficher "Stats du monstre :"
-# 	afficher le nom du monstre et ses points de vie
+def creer_team_panel(equipe):
+	text_equipe = creer_text_equipe(equipe)
+	col_team = Panel(text_equipe, title="🟢 Equipe",
+	                 border_style="green", expand=True)
+	return col_team
 
 
-def tour_de_vague(equipe, monstre):
-	evenements = []
-	evenements += tour_utilisateur(equipe, monstre)
-	if est_entite_en_vie(monstre):
-		evenements += tour_monstre(equipe, monstre)
-	return evenements
-# tour de vague
-# 	Initialiser une liste vide pour les evenements du tour
-# 	evenements += Tour Utilisateur
-# 	si monstre est en vie
-# 		evenements += Tour Monstre
-# 	retourner la liste des evenements du tour
+def creer_text_monstre(monstre):
+	return f"{monstre['name']} - HP: {monstre['hp']}"
 
 
-def tour_monstre(equipe, monstre):
-	evenements = []
-	cible = recuperer_cible(equipe)
-	degat = attaquer(monstre, cible)
-	evenements.append(
-		f"{monstre['name']} inflige {degat} degats a {cible['name']}")
-	return evenements
-# Tour Monstre
-# 	recuperer une cible
-# 	degat = attaquer la cible
-# 	retourner un evenement indiquant que le monstre a inflige des degats a la cible
+def creer_monstre_panel(monstre):
+	text_monstre = creer_text_monstre(monstre)
+	col_monstre = Panel(text_monstre, title="🔴 Monstre",
+	                    border_style="red", expand=True)
+	return col_monstre
 
 
-def attaquer(attacker, cible):
-	degat = calculer_degats(attacker, cible)
-	if degat > cible["hp"]:
-		degat = cible["hp"]
-	cible["hp"] -= degat
-	return degat
-# attaquer la cible
-# 	calculer les degats infliges a la cible
-# 	si degat > hp cible
-# 		degat = hp cible
-# 	reduire les points de vie de la cible en fonction des degats
-# 	retourner les degats infliges
+console = Console()
 
 
-def calculer_degats(attacker, cible):
-	degat = attacker["attack"] - cible["defense"]
-	if degat < 1:
-		degat = 1
-	return degat
-# calculer les degats infliges a la cible
-# 	degat = attaque - defense cible
-# 	si degat < 1
-# 		degat = 1
-# 	retourner degat
-
-# recuperer une cible
-# 	cible_potentielle = recuperer heros en vie de l'equipe
-# 	retourner random.choice(cible_potentielle)
+def creer_infos_panel(evenement):
+	message = evenement["message"]
+	panel = Panel(message, title="Infos", border_style="yellow", expand=True)
+	return panel
 
 
-def recuperer_cible(equipe):
-	cible_potentielle = recuperer_heros_en_vie(equipe)
-	return choice(cible_potentielle)
+def afficher_evenements(player, evenements):
+	titre_tour = creer_titre_tour(player)
+	for evenement in evenements:
+		clear_console()
+
+		team = creer_team_panel(evenement["team"])
+		monster = creer_monstre_panel(evenement["monster"])
+		infos = creer_infos_panel(evenement)
+		console.print(titre_tour)
+		console.print(Columns([team, infos, monster]))
+
+		sleep(2)
 
 
-def recuperer_heros_en_vie(equipe):
-	heros_en_vie = []
-	for hero in equipe:
-		if est_entite_en_vie(hero):
-			heros_en_vie.append(hero)
-	return heros_en_vie
+def lancer_combat_a_mort(db, joueur, equipe):
+	monstres = recuperer_monstres_db(db)
+	joueur.actual_wave = 1
+	while est_equipe_en_vie(equipe):
+		monstre = selectionner_monstre_aleatoire(monstres)
+		victoire = lancer_vague(joueur, equipe, monstre)
+		if victoire:
+			joueur.actual_wave += 1
+	return joueur.actual_wave
 
 
-def tour_utilisateur(equipe, monstre):
-	evenements = []
-	heros_en_vie = recuperer_heros_en_vie(equipe)
-	for hero in heros_en_vie:
-		evenements += tour_perso_jouable(hero, monstre)
-	return evenements
-# Tour Utilisateur
-# 	Initialiser une liste vide pour les evenements du tour utilisateur
-# 	recuperer heros en vie de l'equipe
-# 	pour chaque heros en vie
-# 		evenements += tour perso jouable
-# 	retourner la liste des evenements du tour utilisateur
+def enregistrer_score(db, score):
+	db.scores.insert_one(score)
 
 
-def tour_perso_jouable(hero, monstre):
-	evenements = []
-	if est_entite_en_vie(monstre):
-		degat = attaquer(hero, monstre)
-		evenements.append(
-			f"{hero['name']} inflige {degat} degats a {monstre['name']}")
-	return evenements
-# Tour perso jouable
-# 	evenement = []
-# 	si monstre est en vie
-# 		evenement = attaquer le monstre
-# 	retourner l'evenement du tour du perso
+def lancer_jeu(db):
+	joueur = creer_joueur(db)
 
-
-def create_team(heroes):
-	equipe = []
-	while not equipe_est_complete(equipe):
-		afficher_equipe_actuelle(equipe)
-		heros_dispo = calculer_heros_disponibles(equipe, heroes)
-		options = construire_options(heros_dispo)
-		choix = get_user_choice_from_options(options, "Choisissez un héros : ")
-		selected_hero = copy.deepcopy(heros_dispo[choix - 1])
-		equipe.append(selected_hero)
-	return equipe
-# creer une equipe
-# 	Initialiser une liste vide pour l'equipe
-# 	Tant que pas equipe est complete
-# 		Afficher l'equipe actuelle
-# 		calculer la liste des heros encore disponibles
-# 		construit mes options
-# 		demander un choix valide parmi les options
-# 		ajouter le choix a l'equipe
-# 	retourner l'equipe complete
-
-
-def equipe_est_complete(equipe):
-	if len(equipe) < TAILLE_MAX_EQUIPE:
-		return False
-	return True
-
-
-def hero_to_string(hero):
-	return f"{hero['name']} - ATK : {hero['attack']} - HP : {hero['hp']} - DEF : {hero['defense']}"
-
-
-def construire_options(liste_heros_dispo):
-	options = []
-	for hero in liste_heros_dispo:
-		options.append(hero_to_string(hero))
-	return options
-# construire mes options(liste_heros_dispo)
-# 	Initialiser une liste vide pour les options
-# 	Pour chaque hero dans liste_heros_dispo
-# 		Construire une string "NOM HERO - ATK : <valeur> - HP : <valeur> - DEF : <valeur>"
-# 		Ajouter la string a la liste des options
-# 	retourner la liste des options
-
-
-def calculer_heros_disponibles(equipe, liste_heros):
-	heros_disponibles = []
-	for hero in liste_heros:
-		if hero not in equipe:
-			heros_disponibles.append(hero)
-	return heros_disponibles
-
-# Calculer la liste des heros encore disponibles ( equipe, liste_heros)
-# 	Initialiser une liste vide pour les heros disponibles
-# 	pour chaque hero dans liste_heros
-# 		si hero n'est pas dans equipe
-# 			l'ajouter a la liste des heros disponibles
-# 	retourner la liste des heros disponibles
-
-
-def afficher_personnage(personnage):
-	print(hero_to_string(personnage))
-
-
-def afficher_equipe_actuelle(equipe):
-	for i in range(TAILLE_MAX_EQUIPE):
-		if i < len(equipe):
-			afficher_personnage(equipe[i])
-		else:
-			print("Vide")
-# Afficher l'equipe actuelle
-# 	boucler Taille Max de l'equipe
-# 		Si un hero est present a cet index
-# 			Afficher le hero
-# 		Sinon
-# 			Afficher "Vide"
-
-# equipe est complete
-# 	si la taille de l'equipe < taille maximale
-# 		retourner False
-# 	retourner True
-
-def est_equipe_complete(equipe):
-    return len(equipe) >= TAILLE_MAX_EQUIPE
-
-# recuperer la liste des heros selectionnables
-# 	recuperer la liste des heros depuis la database
-# 	convertir le resultat en liste
-# 	retourner la liste des heros disponibles
-
-
-def get_username(db):
 	while True:
-		pseudo = input("Entrez votre pseudo : ").strip()
-		if validate_username(pseudo, db):
-			return pseudo
-		print("Pseudo invalide, veuillez réessayer.")
+		equipe = creer_equipe(db)
+		waves = lancer_combat_a_mort(db, joueur, equipe)
+		joueur.waves = waves
+		afficher_score(joueur)
+		afficher_leaderboard_joueur(db, joueur.to_db_score())
+		if not replay():
+			break
+	enregistrer_score(db, joueur.to_db_score())
 
 
-def validate_username(pseudo, db):
-	if len(pseudo) < 3 or len(pseudo) > 20:
+def replay():
+	choice = get_valid_choice("Voulez-vous rejouer ?\n1. Oui\n2. Non\nEntrez votre choix: ",
+                           ["1. Oui", "2. Non"], error_message_choice)
+	return choice == 1
+
+
+def clear_console():
+    # 'nt' correspond à Windows, 'posix' correspond à Linux et macOS
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+
+MENU = [
+	"Lancer Jeu",
+	"Afficher LeaderBoard",
+	"Quitter"
+]
+
+
+def error_message_choice():
+	print("Choix invalide, veuillez choisir une option valide")
+
+
+def create_menu_message():
+	message = "Entrez votre choix: "
+	return message
+
+
+def get_valid_choice(message, options, error_message):
+	clear_console()
+	from InquirerPy import inquirer
+	choice = inquirer.select(
+		message=message,
+		choices=options,
+	).execute()
+	return options.index(choice) + 1
+
+
+def is_valid(choice, options):
+
+	if not choice.isdigit():
 		return False
-	if pseudo in banned_pseudos:
+
+	choice = int(choice)
+
+	if choice < 1 or choice > len(options):
 		return False
-	if is_username_in_db(pseudo, db):
-		return False
+
 	return True
-# demander un pseudo utilisateur
-# 	Tant que infini
-# 		demander un input pour le pseudo
-# 		strip le pseudo pour enlever les espaces superflus
-# 		si le pseudo est valide
-# 			retourner le pseudo
-# 		afficher un message d'erreur
 
 
-# Valider un pseudo utilisateur (pseudo)
-# 	si la taille du pseudo est inférieure à 3 ou supérieure à 20
-# 		retourner False
-# 	si pseudo present dans banned_pseudos var in []
-# 		retourner False
-# 	si le pseudo est deja dans la database
-# 		retourner False
-# 	retourner True
-
-def is_username_in_db(pseudo, db):
-	pseudos_in_db = [user["player_name"] for user in db["scores"].find()]
-	if pseudo in pseudos_in_db:
-		return True
-	return False
+def get_menu_choice():
+	message = create_menu_message()
+	choice = get_valid_choice(message, MENU, error_message_choice)
+	return choice
 
 
-banned_pseudos = ["admin", "root", "superuser"]
+client = pymongo.MongoClient(os.getenv("MONGO_URL"))
 
 
-def get_user_choice_from_options(options, message):
+def connect_db():
+	db = client["game_db"]
+	return db
+
+
+def main():
+	db = connect_db()
 	while True:
-		print(message)
-		for i, option in enumerate(options, start=1):
-			print(f"{i}. {option}")
-		choix = input("Entrez votre choix : ").strip()
-		if validate_user_choice(choix, 1, len(options)):
-			return int(choix)
-		print("Choix invalide, veuillez réessayer.")
+		choice = get_menu_choice()
+		lancer_processus(choice, db)
 
 
-def validate_user_choice(choix, minimum, maximum):
-	if not choix.isdigit():
-		return False
-	choix = int(choix)
-	if choix < minimum or choix > maximum:
-		return False
-	return True
+def close_db():
+	client.close()
+
+
+def lancer_processus(choice, db):
+	if choice == 1:
+		lancer_jeu(db)
+	elif choice == 2:
+		afficher_leaderboard(db)
+	elif choice == 3:
+		close_db()
+		print("Fermeture du programme")
+		exit()
+	else:
+		print("Choix invalide")
+
+
+# 		2 : Afficher LeaderBoard (DB)
+# 			Recuperer les scores
+# 			Trier les scores
+# 			Recuperer les 3 plus grands scores [-3:-1]
+# 			Afficher les scores
+# 				pour score dans scores
+# 					Afficher score
+
+
+def get_sorted_scores(list_scores):
+	scores = sorted(list_scores, key=lambda x: x["waves"], reverse=True)
+	return scores
+
+
+def afficher_scores(scores):
+	for score in scores:
+		print(f"{score['player_name']} : {score['waves']}")
+	sleep(0.5)
+
+
+def get_top_scores(list_scores):
+	scores = get_sorted_scores(list_scores)
+	return scores[:TOP_SCORES_COUNT]
+
+
+def get_score_db(db):
+	return list(db.scores.find())
+
+
+def afficher_leaderboard(db):
+	scores_db = get_score_db(db)
+	scores = get_top_scores(scores_db)
+	afficher_scores(scores)
+
+
+def afficher_leaderboard_joueur(db, player):
+	scores_db = get_score_db(db)
+	scores_db.append(player)
+	scores = get_top_scores(scores_db)
+	afficher_scores(scores)
 
 
 main()
-
-
-# Afficher Menu
-# Recuperer un choix valide parmi les options
-#    tant que infini
-#        afficher les options numerotees
-#             pour chaque option dans enumerate(options, start=1)
-#                 afficher {i}. {option}
-#        demander un choix a l'utilisateur
-#        si le choix est valide
-#            retourner le choix valide
-#        afficher un message d'erreur
-
-# choix est valide
-#    si le choix n'est pas isdigit()
-#        retourner False
-#    convertir le choix en entier
-#    si le choix est inférieur au minimum ou supérieur au maximum
-#        retourner False
-#    retourner True
-
-
-def recuperer_choix_utilisateur(options):
-	while True:
-		afficher_options_numerotees(options)
-		choix = input("Entrez votre choix : ")
-		if est_choix_valide(choix, 1, len(options)):
-			return int(choix)
-		print("Choix invalide, veuillez réessayer.")
-
-
-def afficher_options_numerotees(options):
-	for i, option in enumerate(options, start=1):
-		print(f"{i}. {option}")
-
-
-def truc_complexe(choix):
-	# requete...
-
-	return True
-
-
-def est_choix_valide(choix, minimum, maximum):
-	validator = [
-            lambda x: x.isdigit(),
-            lambda x: minimum <= int(x) <= maximum,
-            truc_complexe
-        ]
-	for v in validator:
-		if not v(choix):
-			return False
-	return True
-
-
-# Lancer le processus choisi
-
-choix = recuperer_choix_utilisateur(["Option 1", "Option 2", "Option 3"])
-print(f"Vous avez choisi l'option {choix}")
-
-
-# Besoin la liste des personnages de la DB
-def creer_equipe(liste_personnages_db):
-	# creer la variable equipe vide
-	equipe = []
-	# tant que l'equipe n'est pas complete
-	while not est_equipe_complete(equipe):
-		#     determiner la liste des personnages disponibles
-		personnages_disponibles = determiner_personnages_disponibles(
-			liste_personnages_db, equipe)
-		#     construire la liste des options a afficher disponibles
-		options_affichables = construire_options_affichables(personnages_disponibles)
-		#     recuperer un choix valide
-		choix = recuperer_choix_utilisateur(options_affichables)
-		#     ajouter le personnage choisi a l'equipe index = choix - 1
-		equipe.append(personnages_disponibles[choix - 1])
-	# retourner l'equipe
-	return equipe
-
-# construire la liste des options a afficher disponibles
-
-
-def construire_options_affichables(personnages_disponibles):
-	# creer la liste options
-	options = []
-	# pour chaque personnage dans personnages_disponibles
-	for personnage in personnages_disponibles:
-		#    ajouter a la liste : f"{personnage["nom"]} - ATK : {personnage["atk"]} - DEF : {personnage["def"]}"
-		options.append(
-			f"{personnage['nom']} - ATK : {personnage['atk']} - DEF : {personnage['def']}")
-	# retourner la liste des options
-	return options
-
-	...
-
-
-def determiner_personnages_disponibles(liste_personnages_db, equipe):
-	# creer la liste des personnages disponibles
-	personnages_disponibles = []
-	# pour chaque personnage dans la liste des personnages de la DB
-	for personnage in liste_personnages_db:
-		#     si le personnage n'est pas dans l'equipe
-		if personnage not in equipe:
-			#         l'ajouter a la liste des personnages disponibles
-			personnages_disponibles.append(personnage)
-	# renvoyer la liste des personnages disponibles
-	return personnages_disponibles
