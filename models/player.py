@@ -15,7 +15,7 @@ def generate_list_team(team, all_characters: List[dict]):
 
     return available_character
 
-MAX_TEAM = 2
+MAX_TEAM = 6
 class Player:
     def __init__(self, name: str, score: int = 0, characters: List[Character] = [], inventory: List["Item"] = []):
         self.name = name

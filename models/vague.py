@@ -15,7 +15,7 @@ class Vague:
         self.items = items
 
     def get_difficulty(self) -> int:
-        return min((self.vague - 1) // 30, len(self.difficulties) - 1)
+        return min((self.vague - 1) // 30 + 1, len(self.difficulties))
 
     def create_enemy(self, ennemy_info: dict, difficulty: dict) -> Enemy:
         return Enemy(
@@ -82,6 +82,7 @@ class Vague:
                     break
 
                 character.target = monster_choose
+                print(f"{character.name} attaque {monster_choose.name} !")
                 character.play_turn()
 
             if not monster_choose.is_alive():
@@ -103,6 +104,7 @@ class Vague:
 
             print("=====================================")
             is_win = self.play_vague_round(allies_choose, monster_choose)
+            print(f"{allies_choose.name} a {'gagné' if is_win else 'perdu'} le combat contre {monster_choose.name} !")
             if not monster_choose.is_alive():
                 self.death_ennemy(monster_choose)
                 print(f"{monster_choose.name} est mort !")

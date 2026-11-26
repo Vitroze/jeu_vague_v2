@@ -24,8 +24,12 @@ def request_option(choice: dict, key:str = None):
             max_height="100%",
         ).execute()
 
-        if choose is None or choose == len(choice):
+        if choose == len(choice):
             raise UserQuit("Vous avez quitté pendant la sélection d'une option")
+
+        if not choice_valid_by_key(choose, choice):
+            print("L'option choisie n'existe pas !")
+            continue
 
         return choose
 

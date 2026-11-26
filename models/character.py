@@ -64,7 +64,7 @@ class Entity:
         if not self.target:
             return None
 
-        attack = self.take_damage(self.target)
+        attack = self.target.take_damage(self)
         return attack
 
 class Character(Entity):
