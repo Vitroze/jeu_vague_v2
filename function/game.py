@@ -1,6 +1,6 @@
 from .utils import clear, request_option, request_string
 from .fight import fight
-from models.character import Character
+from models.game import Game
 from models.vague import Vague
 from models.player import Player
 from database.function import get_allies_in_db, get_waves, get_difficulties
@@ -39,4 +39,10 @@ def play():
     #fight(username, player.characters)
 
     vague = Vague(player=player, ennemies=[], waves=get_waves(), difficulties=get_difficulties(), items={})
+    game = Game(player, vague)
+
+    # try:
     vague.start_vague()
+    # except (KeyboardInterrupt, SystemExit):
+    #     print("\nLe jeu a été interrompu par l'utilisateur.")
+    #     print("Le jeu va se fermer...")

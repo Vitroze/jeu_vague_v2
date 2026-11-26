@@ -72,6 +72,18 @@ class Character(Entity):
         super().__init__(name, health, power_attack, power_defense, is_ennemy=False)
         self.equipments: List[Equipable] = []
 
+    @classmethod
+    def create_character(cls, info_character: dict):
+        if not Entity.is_valid_values_for_character(info_character):
+            return None
+
+        return Character(
+            info_character["name"],
+            info_character["health"],
+            info_character["power_attack"],
+            info_character["power_defense"],
+        )
+
     def get_attack_power(self):
         total_attack_power = self.power_attack
         for equipment in self.equipments:

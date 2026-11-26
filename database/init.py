@@ -1,5 +1,6 @@
 from models.database import *
 from .connect import get_collection
+from models.item import Item
 
 # Dictionnaire des personnages et leurs statistiques
 CharacterList = [AlliesDB.__dict__() for AlliesDB in [
@@ -19,7 +20,6 @@ CharacterList = [AlliesDB.__dict__() for AlliesDB in [
 	AlliesDB(name="Samouraï", health=95, power_defense=9, power_attack=22),
 	AlliesDB(name="Templier", health=115, power_defense=13, power_attack=17)
 ]]
-
 
 ItemList = [
 	Item(name="Potion de soin", item_type="consommable",

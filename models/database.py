@@ -1,4 +1,8 @@
-from typing import Dict, List
+from typing import TYPE_CHECKING, List
+
+if TYPE_CHECKING:
+    from models.item import Item
+
 from dataclasses import dataclass
 
 class CharacterDB:
@@ -130,25 +134,6 @@ class SaveDB:
             "monsters": [mon.__dict__() for mon in self.monsters],
             "inventaire": [item.name for item in self.inventaire]
         }
-
-
-@dataclass
-class Item:
-    name: str
-    item_type: str
-    rarity: str
-    effect: Dict[str, int]
-    consumable: bool
-
-    def __dict__(self):
-        return {
-            "name": self.name,
-            "item_type": self.item_type,
-            "rarity": self.rarity,
-            "effect": self.effect,
-            "consumable": self.consumable
-        }
-
 
 @dataclass
 class VagueDB:

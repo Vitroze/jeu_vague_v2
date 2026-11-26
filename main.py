@@ -18,6 +18,7 @@ from function.utils import clear
 from database.connect import connect as connect_db, disconnect as disconnect_db
 from database.init import initialize_database
 from models.exceptions import UserQuit, ErrorDataBase
+from models.game import Game
 
 def main():
     clear()
@@ -37,12 +38,17 @@ def main():
     show_menu()
 
 def finally_programm():
-    disconnect_db()
+    game = Game.get_current_game()
+    if game:
+        game.save_game()
+        print("La partie est bien sauvegardé")
+
+    #disconnect_db()
 
 if __name__ == "__main__":
     try:
         main()
     except (KeyboardInterrupt, UserQuit, ErrorDataBase):
-        finally_programm()
+        pass
     finally:
-        finally_programm
+        finally_programm()

@@ -1,5 +1,7 @@
 from .connect import is_connected, get_collection
 from function.utils import clear_text
+from models.database import CharacterSaveDB, MonsterSaveDB
+from typing import List
 import re
 
 def ignore_case(search: str):
@@ -197,6 +199,15 @@ def get_waves():
 def get_difficulties():
     return list(get_collection("difficulty").find())
 
+@is_connected
+def save_game(player_name:str, score:int, team:List[CharacterSaveDB], ennemies:List[MonsterSaveDB], items:List):
+    get_collection("saves").insert_one({
+        "player_name": player_name,
+        "score": score,
+        "team": [character.__dict__() for character in team],
+        "ennemies": [monster.__dict__() for monster in ennemies],
+        "items": [item.__dict__() for item in items],
+    })
 # A temporary code that, in the event of a database reset, restores the default data for testing purposes.
 
 # CharacterList = [
