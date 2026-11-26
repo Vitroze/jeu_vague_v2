@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from typing import Dict
 from database.function import get_rarities
 from random import random
