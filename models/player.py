@@ -2,7 +2,18 @@ from .character import Character
 from .item import Item
 from typing import List
 from function.utils import clear, request_option
-from function.game import generate_list_team
+
+def can_add_in_team(allies, name_team):
+    return not allies.get("is_ennemy") and allies.get("name") not in name_team
+
+def generate_list_team(team, all_characters: List[dict]):
+    name_team = [ available_character.name for available_character in team ]
+    available_character = [
+        available_character for available_character in all_characters
+        if can_add_in_team(available_character, name_team)
+    ]
+
+    return available_character
 
 MAX_TEAM = 2
 class Player:
@@ -21,19 +32,18 @@ class Player:
         character = characters[id_character]
         return character
 
-    def create_team(self):
+    def create_team(self, all_characters: List[dict]):
         team = []
 
         while len(team) < MAX_TEAM:
             clear()
 
-            available_characters = generate_list_team(team)
+            available_characters = generate_list_team(team, all_characters)
             id_character = request_option(available_characters)
             character = Character.create_character(available_characters[id_character])
-
             team.append(character)
 
-        return team
+        self.characters = team
 
     def get_team_alive(self):
         return [character for character in self.characters if character.is_alive()]
