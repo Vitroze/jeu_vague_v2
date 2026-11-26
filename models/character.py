@@ -80,6 +80,9 @@ class Enemy(Entity):
         return attack
 
     # Pour chaque item dropapble, on va faire un lancé. Un ennemi peut dropper plusieurs items, mais pas forcément tous. On va donc faire un lancé pour chaque item. Si le lancé est réussi, on ajoute l'item à la liste des items dropés. On retourne ensuite cette liste.
-    def drop_loot(self):
-       # return self.dropable
-       pass
+    def drop_loot(self) -> list:
+        dropped_items = []
+        for item in self.dropable:
+            if item.roll_drop():
+                dropped_items.append(item)
+        return dropped_items

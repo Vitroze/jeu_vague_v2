@@ -47,3 +47,9 @@ class Player:
 
     def get_inventory(self):
         return self.inventory
+
+    def add_item(self, item: Item):
+        self.inventory.append(item)
+
+    def add_items(self, items: List[Item]):
+        self.inventory.extend(items)

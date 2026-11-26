@@ -1,4 +1,6 @@
 from typing import Dict
+from database.function import get_rarities
+from random import random
 
 class Item:
     def __init__(self, name: str, item_type: str, rarity: str, effect: Dict[str, int], consumable: bool):
@@ -21,3 +23,10 @@ class Item:
         for stat, value in self.effect.items():
             if hasattr(character, stat):
                 setattr(character, stat, getattr(character, stat) + value)
+
+    def roll_drop(self) -> bool:
+        """Determine if the item is dropped based on its rarity."""
+
+        drop_chances = get_rarities()
+        chance = drop_chances.get(self.rarity, 0)
+        return random() < chance

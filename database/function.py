@@ -184,6 +184,11 @@ def delete_item(id_object: int = None):
 
     print("Votre item a été supprimer !")
 
+@is_connected
+def get_rarities():
+    rarities = list(get_collection("rarities").find())
+    return {rarity.get("name"): rarity.get("chance") for rarity in rarities}
+
 # A temporary code that, in the event of a database reset, restores the default data for testing purposes.
 
 # CharacterList = [
