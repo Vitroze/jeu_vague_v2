@@ -1,6 +1,7 @@
 from .character import Enemy
 from .item import Item
 from .player import Player
+from function.generator import random_list
 from typing import List, Dict
 
 class Vague:
@@ -60,29 +61,48 @@ class Vague:
 
         self.vague += 1
 
+    def random_character(self, list_characters: List[dict]) -> dict:
+        return random_list(list_characters, 1)[0]
+
+    def play_vague_round(self, allies_choose, monster_choose):
+        monster_choose.target = allies_choose
+        while allies_choose.is_alive() and monster_choose.is_alive():
+            monster_choose.play_turn()
+
+            for character in [target for target in self.player.team if target.is_alive()]:
+                character.target = monster_choose
+                character.play_turn()
+
+        return allies_choose.is_alive()
+
     def play_vague(self):
         player, screen = self._player, None # TODO: Implement screen
         if not self.ennemies:
             self.pick_enemies()
 
         while self.ennemies and player.is_team_alive():
-            for character in [target for target in player.team if target.is_alive()]:
-                if not self.ennemies:
-                    break
+            allies_choose = random_list(player.team)
+            monster_choose = random_list(self.ennemies)
 
-                # action = screen.DisplayVue(
-                #     lambda: vue.VueTourJoueur(player.team, character, self.ennemies))
-                # if action == "inventaire":
-                #     player.CheckInventory()
+            is_win = self.play_vague_round(allies_choose, monster_choose)
 
-                character._targets, character._targets_team = self.ennemies, player.team
-                character.play_turn()
-                for dead in self.get_ennemies_death():
-                    self.death_ennemy(dead)
+            # for character in [target for target in player.team if target.is_alive()]:
+            #     if not self.ennemies:
+            #         break
 
-            for monster in self.ennemies:
-                monster._targets = player.team
-                monster.play_turn()
+            #     # action = screen.DisplayVue(
+            #     #     lambda: vue.VueTourJoueur(player.team, character, self.ennemies))
+            #     # if action == "inventaire":
+            #     #     player.CheckInventory()
+
+            #     character._targets, character._targets_team = self.ennemies, player.team
+            #     character.play_turn()
+            #     for dead in self.get_ennemies_death():
+            #         self.death_ennemy(dead)
+
+            # for monster in self.ennemies:
+            #     monster._targets = player.team
+            #     monster.play_turn()
 
             # screen.DisplayVue(
             #     lambda: vue.VueInfoTour(player.team, "Fin du tour", self.ennemies))

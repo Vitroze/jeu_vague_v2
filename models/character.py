@@ -1,4 +1,6 @@
 from function.utils import clamp
+from models.item import Equipable
+from typing import List
 
 class Entity:
     def __init__(self, name: str, health: int, power_attack: int, power_defense: int, is_ennemy: bool = False):
@@ -8,13 +10,20 @@ class Entity:
         self.power_attack = power_attack
         self.power_defense = power_defense
         self.is_ennemy = is_ennemy
+        self.target = None
 
     def set_health(self, health: int):
         health = max(health, 0)
         self.health = health
 
+    def get_attack_power(self):
+        return self.power_attack
+
+    def get_defense_power(self):
+        return self.power_defense
+
     def take_damage(self, other_character):
-        power_attack = other_character.power_attack - self.power_defense
+        power_attack = other_character.get_attack_power() - self.get_defense_power()
         power_attack = max(2, power_attack)
 
         new_health = self.health - power_attack
@@ -55,29 +64,57 @@ class Entity:
         self.health = clamp(self.health + amount, 0, self.max_health)
 
     def play_turn(self):
-        """OVERWRITE THIS FUNCTION IN CHILD CLASS"""
-        pass
+        if not self.target:
+            return None
+
+        attack = self.take_damage(self.target)
+        return attack
 
 class Character(Entity):
     def __init__(self, name: str, health: int, power_attack: int, power_defense: int):
         super().__init__(name, health, power_attack, power_defense, is_ennemy=False)
+        self.equipments: List[Equipable] = []
+
+    def get_attack_power(self):
+        total_attack_power = self.power_attack
+        for equipment in self.equipments:
+            total_attack_power += equipment.get_attack_bonus()
+        return total_attack_power
 
 
-    def play_turn(self):
-        pass
+    def get_defense_power(self):
+        total_defense_power = self.power_defense
+        for equipment in self.equipments:
+            total_defense_power += equipment.get_defense_bonus()
+        return total_defense_power
+
+    def get_equipment(self, slot_name: str):
+        for equipment in self.equipments:
+            if equipment.slot == slot_name:
+                return equipment
+        return None
+
+    def is_slot_available(self, slot_name: str):
+        return self.get_equipment(slot_name) is None
+
+    def equip_item(self, item: Equipable):
+        if  not self.is_slot_available(item.slot):
+            print(f"Le slot {item.slot} est déjà occupé par un autre équipement.")
+            return False
+
+        self.equipments.append(item)
+        self.max_health += item.get_health_bonus()
+
+    def unequip_item(self, item: Equipable):
+        if item in self.equipments:
+            self.equipments.remove(item)
+            self.max_health -= item.get_health_bonus()
+            self.health = min(self.health, self.max_health)
 
 class Enemy(Entity):
     def __init__(self, name: str, health: int, power_attack: int, power_defense: int, dropable: list):
         super().__init__(name, health, power_attack, power_defense, is_ennemy=True)
         self.dropable = dropable
-        self.allies_choose = None
-
-    def play_turn(self):
-        if not self.allies_choose:
-            return None
-
-        attack = self.take_damage(self.allies_choose)
-        return attack
 
     def drop_loot(self) -> list:
         dropped_items = []

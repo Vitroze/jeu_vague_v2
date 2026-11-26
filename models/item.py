@@ -30,3 +30,17 @@ class Item:
         drop_chances = get_rarities()
         chance = drop_chances.get(self.rarity, 0)
         return random() < chance
+
+class Equipable(Item):
+    def __init__(self, name: str, item_type: str, rarity: str, effect: Dict[str, int], consumable: bool, slot: str):
+        super().__init__(name, item_type, rarity, effect, consumable)
+        self.slot = slot
+
+    def get_attack_bonus(self) -> int:
+        return self.effect.get("power_attack", 0)
+
+    def get_defense_bonus(self) -> int:
+        return self.effect.get("power_defense", 0)
+
+    def get_health_bonus(self) -> int:
+        return self.effect.get("health", 0)
