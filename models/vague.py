@@ -69,7 +69,7 @@ class Vague:
         while allies_choose.is_alive() and monster_choose.is_alive():
             monster_choose.play_turn()
 
-            for character in [target for target in self.player.team if target.is_alive()]:
+            for character in self.player.get_team_alive():
                 character.target = monster_choose
                 character.play_turn()
 

@@ -35,6 +35,9 @@ class Player:
 
         return team
 
+    def get_team_alive(self):
+        return [character for character in self.characters if character.is_alive()]
+
     def is_team_alive(self):
         return any(character.is_alive() for character in self.characters)
 
