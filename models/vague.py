@@ -3,15 +3,16 @@ from .item import Item
 from .player import Player
 from function.generator import random_list
 from typing import List, Dict
+from time import sleep
 
 class Vague:
-    def __init__(self, vague: int = 1):
+    def __init__(self, vague: int = 1, player: Player | None = None, ennemies: List[Enemy] = [], waves: List[dict] = [], difficulties: List[dict] = [], items: Dict[str, Item] = {}):
         self.vague = vague
-        self.player = Player | None = None
-        self.ennemies = List[Enemy] = []
-        self.waves = List[dict] = []
-        self.difficulties = List[dict] = []
-        self.items = Dict[str, Item] = {}
+        self.player = player
+        self.ennemies = ennemies
+        self.waves = waves
+        self.difficulties = difficulties
+        self.items = items
 
     def get_difficulty(self) -> int:
         return min((self.vague - 1) // 30, len(self.difficulties) - 1)
@@ -25,20 +26,29 @@ class Vague:
             [self.items[n] for n in ennemy_info.get("dropable", []) if n in self.items]
         )
 
-    def pick_ennemies(self) -> List[Enemy]:
-        number = (self.vague - 1) % 30 + 1
-        wave = next(w for w in self._waves if w["start_number"] <= number <= w["end_number"])
-        level = self.get_difficulty()
-        difficulty = next(d for d in self._difficulties if d["lap"] == level)
+    def get_difficulty_config(self) -> dict:
+        lap = self.get_difficulty()
+        default = {"lap": lap, "health_multiplier": 1, "attack_multiplier": 1, "defense_multiplier": 1, "item_multiplier": 1}
+        return next((d for d in self.difficulties if d["lap"] == lap), default)
 
+    def pick_enemies(self) -> List[Enemy]:
+        number = (self.vague - 1) % 30 + 1
+        wave = next((w for w in self.waves if w["start_number"] <= number <= w["end_number"]), None)
+        if wave is None:
+            self.ennemies = []
+            return self.ennemies
+
+        difficulty = self.get_difficulty_config()
         self.ennemies = [
             self.create_enemy(ennemy_info, difficulty)
             for ennemy_info in wave["monsters"]
         ]
 
+        return self.ennemies
+
     def pick_items(self) -> List[Item]:
         level = self.get_difficulty()
-        difficulty = next(d for d in self._difficulties if d["lap"] == level)
+        difficulty = next(d for d in self.difficulties if d["lap"] == level)
         self.items = [
             self.items[n]
             for n in difficulty.get("items", [])
@@ -67,45 +77,67 @@ class Vague:
     def play_vague_round(self, allies_choose, monster_choose):
         monster_choose.target = allies_choose
         while allies_choose.is_alive() and monster_choose.is_alive():
-            monster_choose.play_turn()
-
             for character in self.player.get_team_alive():
+                if not monster_choose.is_alive():
+                    break
+
                 character.target = monster_choose
                 character.play_turn()
+
+            if not monster_choose.is_alive():
+                break
+
+            monster_choose.play_turn()
 
         return allies_choose.is_alive()
 
     def play_vague(self):
-        player, screen = self._player, None # TODO: Implement screen
+        player, screen = self.player, None # TODO: Implement screen
         if not self.ennemies:
             self.pick_enemies()
 
+        print(f"Vague {self.vague} : {len(self.ennemies)} ennemis à affronter !")
         while self.ennemies and player.is_team_alive():
-            allies_choose = random_list(player.team)
+            allies_choose = random_list(player.characters)
             monster_choose = random_list(self.ennemies)
 
+            print("=====================================")
             is_win = self.play_vague_round(allies_choose, monster_choose)
+            if not monster_choose.is_alive():
+                self.death_ennemy(monster_choose)
+                print(f"{monster_choose.name} est mort !")
+            print("=====================================")
 
-            # for character in [target for target in player.team if target.is_alive()]:
+            # for character in [target for target in player.characters if target.is_alive()]:
             #     if not self.ennemies:
             #         break
 
             #     # action = screen.DisplayVue(
-            #     #     lambda: vue.VueTourJoueur(player.team, character, self.ennemies))
+            #     #     lambda: vue.VueTourJoueur(player.characters, character, self.ennemies))
             #     # if action == "inventaire":
             #     #     player.CheckInventory()
 
-            #     character._targets, character._targets_team = self.ennemies, player.team
+            #     character.targets, character.targets_team = self.ennemies, player.characters
             #     character.play_turn()
             #     for dead in self.get_ennemies_death():
             #         self.death_ennemy(dead)
 
             # for monster in self.ennemies:
-            #     monster._targets = player.team
+            #     monster.targets = player.characters
             #     monster.play_turn()
 
             # screen.DisplayVue(
-            #     lambda: vue.VueInfoTour(player.team, "Fin du tour", self.ennemies))
+            #     lambda: vue.VueInfoTour(player.characters, "Fin du tour", self.ennemies))
 
         if player.is_team_alive():
             self.add_score(1)
+            print(f"Vous avez survécu à la vague {self.vague - 1} !")
+
+        sleep(.75)
+
+    def start_vague(self):
+        while self.player.is_team_alive():
+            self.play_vague()
+            if not self.player.is_team_alive():
+                print(f"Vous avez perdu à la vague {self.vague} !")
+                break

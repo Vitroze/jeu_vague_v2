@@ -29,13 +29,10 @@ class Entity:
         new_health = self.health - power_attack
         self.set_health(new_health)
 
+        print(f"{self.name} a subit {power_attack} de dégâts de la part de {other_character.name} (PV restant : {self.health}/{self.max_health})")
         return power_attack
 
         # TODO: Refaire l'affichage dans des fonctions séparés
-        # print(f"{self.name} a subit {power_attack} de dégâts de la part de {other_character.name}")
-
-        # if new_health < 1:
-        #     print(f"{self.name} est mort !")
 
     def is_alive(self):
         return self.health > 0

@@ -1,8 +1,9 @@
 from .utils import clear, request_option, request_string
 from .fight import fight
 from models.character import Character
+from models.vague import Vague
 from models.player import Player
-from database.function import get_allies_in_db
+from database.function import get_allies_in_db, get_waves, get_difficulties
 
 # def can_add_in_team(allies, name_team):
 #     return not allies.get("is_ennemy") and allies.get("name") not in name_team
@@ -35,4 +36,7 @@ def play():
     player = Player(username)
     player.create_team(get_allies_in_db())
 
-    fight(username, player.characters)
+    #fight(username, player.characters)
+
+    vague = Vague(player=player, ennemies=[], waves=get_waves(), difficulties=get_difficulties(), items={})
+    vague.start_vague()

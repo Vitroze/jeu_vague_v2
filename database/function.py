@@ -189,6 +189,14 @@ def get_rarities():
     rarities = list(get_collection("rarities").find())
     return {rarity.get("name"): rarity.get("chance") for rarity in rarities}
 
+@is_connected
+def get_waves():
+    return list(get_collection("vagues").find())
+
+@is_connected
+def get_difficulties():
+    return list(get_collection("difficulty").find())
+
 # A temporary code that, in the event of a database reset, restores the default data for testing purposes.
 
 # CharacterList = [
