@@ -197,7 +197,7 @@ class Character(Entity):
             return f"{self.name} a utilisé {item.name}."
 
     def unequip_item_menu(self):
-        if not self.equipments:
+        if not self.equipments or len(self.equipments) == 0:
             return "Aucun objet équipé."
 
         choice = Affichage.display_vue(VueSelectionObjet(self, self.equipments, title=f"Choisir un objet à déséquiper pour {self.name}"), len(self.equipments))
