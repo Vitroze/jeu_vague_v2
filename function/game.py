@@ -22,9 +22,14 @@ def check_username(username: str) -> bool:
     return True
 
 def new_game(no_verify: bool = False) -> Game:
-    username = request_string("Quel est votre nom d'utilisateur ?")
+    username = request_string("Quel est votre nom d'utilisateur (back pour revenir au menu principale) ?")
     if not no_verify and not check_username(username):
         return new_game()
+
+    if username.lower() == "back":
+        from function.main_menu import show_menu
+        show_menu()
+        return
 
     return Game(Player(username), Vague(), select_character)
 
