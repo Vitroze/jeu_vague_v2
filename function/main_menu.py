@@ -25,11 +25,6 @@ options = [
 
 def show_menu():
     clear()
-    # vue = VueEcranTitre()
-    # affichage.update_live(vue)
-
-    # value = request_option(options)
-    # options[value]["callback"]()
 
     value = request_option_affichage(options)
     options[value]["callback"]()

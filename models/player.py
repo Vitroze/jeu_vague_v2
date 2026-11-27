@@ -1,7 +1,10 @@
+from models.vue import VueSelectionEquipe
+
 from .character import Character
 from .item import Item, Consumable, Equipable
 from typing import List
 from function.utils import clear, request_option
+from .affichage import Affichage
 
 def can_add_in_team(allies, name_team):
     if isinstance(allies, Character):
@@ -39,12 +42,19 @@ class Player:
         team = []
 
         while len(team) < MAX_TEAM:
-            clear()
-
             available_characters = generate_list_team(team, all_characters)
-            id_character = request_option(available_characters)
-#            character = Character.create_character(available_characters[id_character])
-            team.append(available_characters[id_character])
+            id_character =Affichage.display_vue(VueSelectionEquipe(team, available_characters))
+            character = Character.create_character(available_characters[id_character])
+            if character is None:
+                continue
+
+            team.append(character)
+#             clear()
+
+#             available_characters = generate_list_team(team, all_characters)
+#             id_character = request_option(available_characters)
+# #            character = Character.create_character(available_characters[id_character])
+#             team.append(available_characters[id_character])
 
         self.characters = team
 
