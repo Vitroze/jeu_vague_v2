@@ -68,18 +68,10 @@ def request_option_affichage(options: dict):
     try:
         while True:
             choix = Affichage.display_vue(menu, len(options))
-            print(f"Choix sélectionné : {choix}")
-            print(len(options) - 1, choix == (len(options) - 1))
             if choix is None or choix == (len(options) - 1):
                 raise UserQuit("Vous avez quitté pendant la sélection d'une option")
-            # nom, vue, max_index = options[choix]
-            # resultat = Affichage.display_vue(vue, max_index)
-            # if resultat is not None:
-            #     Affichage.console.print(f"{nom} → index retourné : {resultat}")
 
             return choix
-
-            #Affichage.console.print(f"{nom} → index retourné : {resultat}")
     except KeyboardInterrupt:
         print("Ctrl+C détecté, sortie du jeu.")
         pass
