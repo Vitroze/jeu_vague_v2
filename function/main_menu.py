@@ -2,7 +2,6 @@ from function.game import play, resume
 from function.config import menu_config
 from function.utils import request_option_affichage, clear
 from function.score import show_score
-from models.vue import VueEcranTitre
 
 options = [
     {
