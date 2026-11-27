@@ -34,7 +34,7 @@ class Entity(ABC):
         }
 
     def take_damage(self, amount: int):
-        self.set_health(self.heath - amount)
+        self.set_health(self.health - amount)
         return amount
         # power_attack = other_character.get_attack_power() - self.get_defense_power()
         # power_attack = max(2, power_attack)
