@@ -93,7 +93,8 @@ class Entity(ABC):
         if not target:
             return None
 
-        attack = target.take_damage(self)
+        amount = self.get_attack_power() - target.get_defense_power()
+        attack = target.take_damage(amount)
         return attack
 
     @classmethod
