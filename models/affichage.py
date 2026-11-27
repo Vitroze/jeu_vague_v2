@@ -76,7 +76,7 @@ class Affichage:
 
 	@classmethod
 	def create_info_box(cls, titre: str, info: str, box_color: str, text_color: str) -> Panel:
-		texte = Text(info, justify="center", style=text_color)
+		texte = Text.from_markup(info, justify="center", style=text_color)
 		return Panel(
 			texte,
 			title=f"[bold {box_color}]✦ {titre} ✦[/]",

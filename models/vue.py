@@ -147,9 +147,16 @@ def VueSelectionCibleObjet(objet, team: List) -> Callable:
 def VueTourJoueur(team: List, perso, ennemis: List) -> Callable:
 
 	def inner_VueTourJoueur(index: int):
+		info = ""
+		for member in team:
+			if member == perso:
+				info += f"[bold yellow]{str(member)}[/]\n"
+			else:
+				info += f"{str(member)}\n"
+
 		selected_box = Affichage.create_info_box(
 			titre=f"Tour du personnage : {perso.name}",
-			info="\n".join(str(member) for member in team),
+			info=info,
 			box_color="blue",
 			text_color="white",
 		)
