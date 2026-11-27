@@ -13,6 +13,7 @@ from models.vague import Vague
 from models.item import Item
 from database.function import get_items, get_rarities, save_game as save_game_db
 from models.exceptions import UserQuit
+from models.vue import VueGameOver
 
 class Game:
     _instance = None  # Variable de classe pour stocker l'instance unique
@@ -96,6 +97,9 @@ class Game:
         self.vague.restore(data.get("vague", 1), data.get("ennemies", []), get_ennemies_in_db())
         return True
 
+    def show_game_over(self):
+        Affichage.display_vue(VueGameOver(), 1)
+
     def launch_game(self):
         self.load_config()
 
@@ -116,7 +120,7 @@ class Game:
         if self.player.is_team_alive():
             return False
 
-        print(f"Vous avez perdu à la vague {self.vague.vague} !")
+        self.show_game_over()
         add_score_db(self.player.name, self.player.score)
         delete_save(self.player.name)
         return True
