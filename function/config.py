@@ -47,7 +47,7 @@ def is_admin(fc):
         if get_access_token():
             return fc(*args, **kwars)
 
-        request_password("Veuillez rentrer le mot de passe de l'admin", os.getenv("ADMIN_PASSWORD"))
+        request_password("Veuillez rentrer le mot de passe de l'admin (Laissez vide pour retourner au menu principale)", os.getenv("ADMIN_PASSWORD"))
 
         save_token(generate_token())
         return fc(*args, **kwars)

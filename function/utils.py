@@ -148,6 +148,11 @@ def request_password(text:str, correct_password:str = None):
         raise UserQuit("Vous avez quitté pendant la saisi d'un mot de passe")
 
     request_user = request_user.get("request")
+    if len(request_user) == 0:
+        from function.main_menu import show_menu
+        show_menu()
+        return
+
     if len(request_user) < 3:
         return request_password(text, correct_password)
 

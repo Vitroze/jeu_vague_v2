@@ -14,21 +14,7 @@ def format_entities(entities: List[dict]) -> str:
     )
 
 def show_event(evenement: str, vague: object):
-    # affichage = Affichage()
-
     Affichage.display_vue(VueInfoTour(vague.player.get_team_alive(), evenement, vague.ennemies))
-
-    # for evenement in evenements:
-    #     vue = affichage.create_multiples_info_boxes(
-    #         titre=f"Vague {vague.vague}",
-    #         infos=[
-    #             {"title": "Équipe du joueur", "content": format_entities(evenement["team"])},
-    #             {"title": "Événements du tour", "content": evenement["message"]},
-    #             {"title": "Ennemis", "content": format_entities(evenement["enemies"])},
-    #         ]
-    #     )
-    #     affichage.update_live(vue)
-    #     sleep(1.25)
 
 class Vague:
     def __init__(self, vague: int = 1, player: Player | None = None, ennemies: List[Enemy] = [], waves: List[dict] = [], difficulties: List[dict] = [], items: Dict[str, Item] = {}):

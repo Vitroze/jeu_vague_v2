@@ -46,10 +46,10 @@ class Entity(ABC):
         return target.take_damage(power_attack)
 
     def is_alive(self):
-        return self.health > 0
+        return self.health >= 1
 
     def is_death(self):
-        return self.health <= 0
+        return self.health < 1
 
     @classmethod
     def is_valid_values_for_character(cls, dict_character: dict)->bool:
@@ -174,20 +174,23 @@ class Character(Entity):
         item = inventory[choice]
         return item
 
-    def use_item(self, inventory, allies):
+    def use_item(self, vague):
+        inventory = vague.player.inventory
+        allies = vague.player.get_team_alive()
         if not inventory:
-            return "Aucun objet disponible pour utilisation."
+            Affichage.show_error("Aucun objet disponible pour utilisation.")
+            return self.play_turn(vague)
 
         item = self.get_choice_item(inventory, allies)
 
-        print(item, inventory)
-
         if item in self.equipments and isinstance(item, Equipable):
-            return f"{self.name} a déjà équipé {item.name}."
+            Affichage.show_error(f"{self.name} a déjà équipé {item.name}.")
+            return self.play_turn(vague)
         elif not item in self.equipments and isinstance(item, Equipable):
             passed = self.equip_item(item)
             if not passed:
-                return f"{self.name} ne peut pas équiper {item.name} car le slot est déjà occupé."
+                Affichage.show_error(f"{self.name} ne peut pas équiper {item.name} car le slot est déjà occupé.")
+                return self.play_turn(vague)
 
             inventory.remove(item)
             return f"{self.name} a équipé {item.name}."
@@ -196,9 +199,10 @@ class Character(Entity):
             inventory.remove(item)
             return f"{self.name} a utilisé {item.name}."
 
-    def unequip_item_menu(self):
+    def unequip_item_menu(self, vague):
         if not self.equipments or len(self.equipments) == 0:
-            return "Aucun objet équipé."
+            Affichage.show_error(f"{self.name} n'a aucun objet équipé.")
+            return self.play_turn(vague)
 
         choice = Affichage.display_vue(VueSelectionObjet(self, self.equipments, title=f"Choisir un objet à déséquiper pour {self.name}"), len(self.equipments))
         item = self.equipments[choice]
@@ -220,9 +224,9 @@ class Character(Entity):
             damage = self.attack_target(vague.ennemies)
             return f"{self.name} attaque {self.target.name} et inflige {damage} degats !" if damage else f"{self.name} attaque mais rate sa cible !"
         elif choice == 1:
-            return self.use_item(vague.player.inventory, vague.player.get_team_alive())
+            return self.use_item(vague)
         elif choice == 2:
-            return self.unequip_item_menu()
+            return self.unequip_item_menu(vague)
 
         return f"{self.name} ne fait rien ce tour-ci."
         #return self.attack_target()
