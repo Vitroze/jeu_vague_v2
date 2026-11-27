@@ -1,6 +1,6 @@
 from time import sleep
 
-from function.score import sorted_score, print_score
+from function.score import show_score
 from models.affichage import Affichage
 from database.function import (
     get_allies_in_db, get_ennemies_in_db, get_items, get_rarities, get_waves, get_difficulties,
@@ -98,7 +98,11 @@ class Game:
         return True
 
     def show_game_over(self):
-        Affichage.display_vue(VueGameOver(), 1)
+        choose = Affichage.display_vue(VueGameOver(), 1)
+        if choose == 0:
+            self.show_leaderboard()
+        else:
+            self.exit()
 
     def launch_game(self):
         self.load_config()
@@ -120,14 +124,13 @@ class Game:
         if self.player.is_team_alive():
             return False
 
-        self.show_game_over()
         add_score_db(self.player.name, self.player.score)
         delete_save(self.player.name)
+        self.show_game_over()
         return True
 
     def show_leaderboard(self):
-        scores = sorted_score()
-        print_score(scores)
+        show_score()
 
     def exit(self):
         raise UserQuit("L'utilisateur a quitté le jeu.")
