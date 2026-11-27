@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from function.utils import clamp
 from models.item import Consumable, Equipable
 from models.affichage import Affichage
-from models.vue import VueTourJoueur, VueChoixCible, VueInventaire
+from models.vue import VueTourJoueur, VueChoixCible, VueSelectionObjet
 from typing import List
 
 class Entity(ABC):
@@ -170,7 +170,7 @@ class Character(Entity):
         if not inventory:
             return None
 
-        choice = Affichage.display_vue(VueInventaire(inventory, teams), len(inventory))
+        choice = Affichage.display_vue(VueSelectionObjet(self, inventory), len(inventory))
         item = inventory[choice]
         return item
 
@@ -183,8 +183,7 @@ class Character(Entity):
         print(item, inventory)
 
         if item in self.equipments and isinstance(item, Equipable):
-            self.unequip_item(item)
-            return f"{self.name} a déséquipé {item.name}."
+            return f"{self.name} a déjà équipé {item.name}."
         elif not item in self.equipments and isinstance(item, Equipable):
             passed = self.equip_item(item)
             if not passed:
@@ -197,6 +196,16 @@ class Character(Entity):
             inventory.remove(item)
             return f"{self.name} a utilisé {item.name}."
 
+    def unequip_item(self):
+        if not self.equipments:
+            return "Aucun objet équipé."
+
+        choice = Affichage.display_vue(VueSelectionObjet(self, self.equipments), len(self.equipments))
+        item = self.equipments[choice]
+
+        self.unequip_item(item)
+        return f"{self.name} a déséquipé {item.name}."
+
     def play_turn(self, vague) -> str:
         player = vague.player
         if not player:
@@ -206,12 +215,14 @@ class Character(Entity):
         if not ennemies:
             return 0
 
-        choice = Affichage.display_vue(VueTourJoueur(player.get_team_alive(), self, ennemies), 3)
+        choice = Affichage.display_vue(VueTourJoueur(player.get_team_alive(), self, ennemies), 4)
         if choice == 0:
             damage = self.attack_target(vague.ennemies)
             return f"{self.name} attaque {self.target.name} et inflige {damage} degats !" if damage else f"{self.name} attaque mais rate sa cible !"
         elif choice == 1:
             return self.use_item(vague.player.inventory, vague.player.get_team_alive())
+        elif choice == 2:
+            return self.unequip_item()
 
         return f"{self.name} ne fait rien ce tour-ci."
         #return self.attack_target()

@@ -5,7 +5,7 @@ from typing import Callable
 from .affichage import Affichage
 
 
-OPTIONS_TOUR = ["Attaquer", "Utiliser un objet", "Passer"]
+OPTIONS_TOUR = ["Attaquer", "Utiliser un objet", "Retirer un objet", "Passer"]
 OPTIONS_ECRAN_TITRE = ["Nouvelle Partie",
                        "Charger Partie", "Leaderboard", "Quitter"]
 OPTIONS_GAME_OVER = ["Retour à l'écran titre", "Quitter"]
@@ -88,6 +88,35 @@ def VueInventaire(inventaire: List, team: List) -> Callable:
 
 	return inner_VueInventaire
 
+def VueSelectionObjet(Character, inventaire: List) -> Callable:
+	def create_details_info(index: int) -> str:
+		if not inventaire:
+			return "Inventaire vide"
+		return details_objet(inventaire[index])
+
+	def inner_VueSelectionObjet(index: int):
+		selected_box = Affichage.create_select_box(
+			titre=f"Choisir un objet pour {Character.name}",
+			items=inventaire,
+			index=index,
+			box_color="blue",
+			text_color="white",
+			hover_color="yellow"
+		)
+
+		details = Affichage.create_info_box(
+			titre="Détails",
+			info=create_details_info(index),
+			box_color="magenta",
+			text_color="white"
+		)
+
+		return create_columns([
+			selected_box,
+			details
+		])
+
+	return inner_VueSelectionObjet
 
 def VueSelectionCibleObjet(objet, team: List) -> Callable:
 	def inner_VueSelectionCibleObjet(index: int):
