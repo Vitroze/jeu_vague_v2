@@ -102,6 +102,8 @@ class Entity(ABC):
         )
 
     def __str__(self):
+        if isinstance(self, Character) and self.equipments:
+            return f"{self.name} ; {', '.join([e.name for e in self.equipments])} (HP: {self.health}/{self.max_health}, ATK: {self.get_attack_power()}, DEF: {self.get_defense_power()})"
         return f"{self.name} (HP: {self.health}/{self.max_health}, ATK: {self.get_attack_power()}, DEF: {self.get_defense_power()})"
 
 class Character(Entity):
@@ -188,6 +190,7 @@ class Character(Entity):
             if not passed:
                 return f"{self.name} ne peut pas équiper {item.name} car le slot est déjà occupé."
 
+            inventory.remove(item)
             return f"{self.name} a équipé {item.name}."
         elif isinstance(item, Consumable):
             item.use(self)
