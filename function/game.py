@@ -21,9 +21,9 @@ def check_username(username: str) -> bool:
         return False
     return True
 
-def new_game() -> Game:
+def new_game(no_verify: bool = False) -> Game:
     username = request_string("Quel est votre nom d'utilisateur ?")
-    if not check_username(username):
+    if not no_verify and not check_username(username):
         return new_game()
 
     return Game(Player(username), Vague(), select_character)
@@ -33,7 +33,7 @@ def play():
         print("Erreur lors du lancement du jeu. Veuillez réessayer.")
 
 def resume():
-    game = new_game()
+    game = new_game(True)
     if not game.load_game():
         print("Aucune partie sauvegardée trouvée pour cet utilisateur.")
         return
