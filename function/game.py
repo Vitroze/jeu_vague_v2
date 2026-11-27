@@ -36,6 +36,6 @@ def resume():
     game = new_game(True)
     if not game.load_game():
         print("Aucune partie sauvegardée trouvée pour cet utilisateur.")
-        return
+        return resume()
 
     game.launch_game()
