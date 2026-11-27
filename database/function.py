@@ -200,7 +200,7 @@ def get_difficulties():
     return list(get_collection("difficulty").find())
 
 @is_connected
-def save_game(player_name:str, score:int, team:List[CharacterSaveDB], ennemies:List[MonsterSaveDB], items:List):
+def save_game(player_name:str, score:int, team:List[CharacterSaveDB], ennemies:List[MonsterSaveDB], items:List, vague:int):
     get_collection("saves").replace_one({
         "player_name": ignore_case(player_name)
     }, {
@@ -209,6 +209,7 @@ def save_game(player_name:str, score:int, team:List[CharacterSaveDB], ennemies:L
         "team": [character.__dict__() for character in team],
         "ennemies": [monster.__dict__() for monster in ennemies],
         "items": [item.__dict__() for item in items],
+        "vague": vague
     }, upsert=True)
 
 @is_connected
