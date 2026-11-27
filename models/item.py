@@ -36,7 +36,7 @@ class Item:
         return item_class(name, item_type, rarity, effect, description, drop_rate)
 
     @staticmethod
-    def from_dict(info_item: dict, rarities: Dict[str, float] = None) -> "Item" | None:
+    def from_dict(info_item: dict, rarities: Dict[str, float] = None):
         if not info_item or not info_item.get("name"):
             return None
 
