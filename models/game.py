@@ -110,11 +110,8 @@ class Game:
         while self.player.is_team_alive():
             if not self.vague.play_vague():
                 break
-
-            self.affichage.stop_live()
             sleep(.75)
 
-        self.affichage.stop_live()
         if self.player.is_team_alive():
             return False
 
