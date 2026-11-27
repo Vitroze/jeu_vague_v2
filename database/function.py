@@ -189,7 +189,7 @@ def delete_item(id_object: int = None):
 @is_connected
 def get_rarities():
     rarities = list(get_collection("rarities").find())
-    return {rarity.get("name"): rarity.get("chance") for rarity in rarities}
+    return {rarity.get("name"): rarity.get("drop_rate") for rarity in rarities}
 
 @is_connected
 def get_waves():
@@ -201,12 +201,26 @@ def get_difficulties():
 
 @is_connected
 def save_game(player_name:str, score:int, team:List[CharacterSaveDB], ennemies:List[MonsterSaveDB], items:List):
-    get_collection("saves").insert_one({
+    get_collection("saves").replace_one({
+        "player_name": ignore_case(player_name)
+    }, {
         "player_name": player_name,
         "score": score,
         "team": [character.__dict__() for character in team],
         "ennemies": [monster.__dict__() for monster in ennemies],
         "items": [item.__dict__() for item in items],
+    }, upsert=True)
+
+@is_connected
+def get_save(player_name:str):
+    return get_collection("saves").find_one({
+        "player_name": ignore_case(player_name)
+    })
+
+@is_connected
+def delete_save(player_name:str):
+    get_collection("saves").delete_one({
+        "player_name": ignore_case(player_name)
     })
 # A temporary code that, in the event of a database reset, restores the default data for testing purposes.
 
