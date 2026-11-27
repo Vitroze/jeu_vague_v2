@@ -99,7 +99,7 @@ def get_playerdata_username(username: str):
 
 @is_connected
 def is_exist_username(username: str):
-    return get_playerdata_username(username) != None
+    return get_playerdata_username(username) != None or get_save(username) != None
 
 def is_best_score(score: int, best_score: int):
     return score > best_score

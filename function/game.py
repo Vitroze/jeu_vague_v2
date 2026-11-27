@@ -1,10 +1,9 @@
-from models import character
 from .utils import request_option, request_string, clear
 from models.game import Game
 from models.vague import Vague
 from models.player import Player
-from models.affichage import Affichage
-from database.function import get_allies_in_db, get_waves, get_difficulties
+from database.function import is_exist_username
+from time import sleep
 
 def select_character(characters) -> int:
     clear()
@@ -15,8 +14,18 @@ def select_character(characters) -> int:
 
     return request_option(options)
 
+def check_username(username: str) -> bool:
+    if is_exist_username(username):
+        print("Ce nom d'utilisateur existe déjà !")
+        sleep(.75)
+        return False
+    return True
+
 def new_game() -> Game:
     username = request_string("Quel est votre nom d'utilisateur ?")
+    if not check_username(username):
+        return new_game()
+
     return Game(Player(username), Vague(), select_character)
 
 def play():
