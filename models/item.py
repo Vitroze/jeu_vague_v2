@@ -33,7 +33,6 @@ class Item:
     @staticmethod
     def create(name: str, item_type: str, rarity: str, effect: Dict[str, int], consumable: bool, description: str = "", drop_rate: float = 0.0) -> "Item":
         item_class = Consumable if consumable else Equipable
-        print(f"Creating item: {name}, Type: {item_type}, Rarity: {rarity}, Consumable: {consumable}, Drop Rate: {drop_rate}")
         return item_class(name, item_type, rarity, effect, description, drop_rate)
 
     @staticmethod
