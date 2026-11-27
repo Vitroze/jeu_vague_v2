@@ -43,7 +43,7 @@ class Player:
 
         while len(team) < MAX_TEAM:
             available_characters = generate_list_team(team, all_characters)
-            id_character = Affichage.display_vue(VueSelectionEquipe(team, available_characters))
+            id_character = Affichage.display_vue(VueSelectionEquipe(team, available_characters), len(available_characters))
             character = available_characters[id_character]
             if character is None:
                 continue
