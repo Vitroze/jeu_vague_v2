@@ -1,6 +1,6 @@
 from models.affichage import Affichage
 
-from .character import Enemy
+from .character import Entity, Enemy
 from .item import Item
 from .player import Player
 from function.generator import random_list
@@ -36,6 +36,7 @@ class Vague:
         self.waves = waves
         self.difficulties = difficulties
         self.items = items
+        self.on_turn = None
 
     def get_difficulty(self) -> int:
         return min((self.vague - 1) // 30 + 1, len(self.difficulties))
@@ -69,21 +70,24 @@ class Vague:
 
         return self.ennemies
 
-    def pick_items(self) -> List[Item]:
-        level = self.get_difficulty()
-        difficulty = next(d for d in self.difficulties if d["lap"] == level)
-        self.items = [
-            self.items[n]
-            for n in difficulty.get("items", [])
-            if n in self.items
-        ]
+    def restore(self, vague:int, saved_ennemies: List[dict], ennemy_docs: List[dict]):
+        self.vague = vague
+        templates = {doc["name"]: doc for doc in ennemy_docs}
+        difficulty = self.get_difficulty_config()
 
-        return self.items
+        self.ennemies = []
+        for saved_ennemy in saved_ennemies:
+            if saved_ennemy["name"] in templates:
+                ennemy = self.create_enemy(templates[saved_ennemy["name"]], difficulty)
+                ennemy.set_health(saved_ennemy["health"])
+                self.ennemies.append(ennemy)
 
     def death_ennemy(self, ennemy: Enemy):
         if ennemy in self.ennemies:
             self.ennemies.remove(ennemy)
-            self.player.add_items(ennemy.drop_loot())
+
+            if self.player:
+                self.player.add_items(ennemy.drop_loot(multiplier=self.get_difficulty_config().get("item_multiplier", 1.0)))
 
     def get_ennemies_death(self) -> List[Enemy]:
         return [ennemy for ennemy in self.ennemies if not ennemy.is_alive()]
@@ -94,14 +98,17 @@ class Vague:
 
         self.vague += 1
 
-    def random_character(self, list_characters: List[dict]) -> dict:
-        return random_list(list_characters, 1)[0]
+    def describe_attack(self, attacker: Entity, target: Entity, damage: int) -> str:
+        if target.is_death():
+            return f"{target.name} a été vaincu par {attacker.name} !"
 
-    def save_event(self, event: dict) -> dict:
+        return f"{attacker.name} inflige {damage} degats a {target.name}"
+
+    def save_event(self, message: str) -> dict:
         return {
-            "message": event["message"],
-            "team": [c.to_dict() for c in self.player.characters],
-            "enemies": [e.to_dict() for e in self.ennemies],
+            "message": message,
+            "team": [Character.to_dict() for Character in self.player.characters],
+            "enemies": [Enemy.to_dict() for Enemy in self.ennemies],
         }
 
     def play_vague_round(self, allies_choose, monster_choose):
@@ -115,14 +122,14 @@ class Vague:
                     break
 
                 character.target = monster_choose
-                event = character.play_turn()
-                if event:
-                    list_event.append(self.save_event(event))
+                damage = character.play_turn()
+                if damage:
+                    list_event.append(self.save_event(self.describe_attack(character, monster_choose, damage)))
 
             if monster_choose.is_alive():
-                event = monster_choose.play_turn()
-                if event:
-                    list_event.append(self.save_event(event))
+                damage = monster_choose.play_turn()
+                if damage:
+                    list_event.append(self.save_event(self.describe_attack(monster_choose, allies_choose, damage)))
 
             show_event(list_event, self)
 
@@ -130,47 +137,25 @@ class Vague:
 
     def play_vague(self):
         player, screen = self.player, None # TODO: Implement screen
+        if not player:
+            return False
+
         if not self.ennemies:
             self.pick_enemies()
+
+        if not self.ennemies:
+            return False
 
         while self.ennemies and player.is_team_alive():
             allies_choose = random_list(player.characters)
             monster_choose = random_list(self.ennemies)
 
-            is_win = self.play_vague_round(allies_choose, monster_choose)
+            self.play_vague_round(allies_choose, monster_choose)
             if not monster_choose.is_alive():
                 self.death_ennemy(monster_choose)
-
-            # for character in [target for target in player.characters if target.is_alive()]:
-            #     if not self.ennemies:
-            #         break
-
-            #     # action = screen.DisplayVue(
-            #     #     lambda: vue.VueTourJoueur(player.characters, character, self.ennemies))
-            #     # if action == "inventaire":
-            #     #     player.CheckInventory()
-
-            #     character.targets, character.targets_team = self.ennemies, player.characters
-            #     character.play_turn()
-            #     for dead in self.get_ennemies_death():
-            #         self.death_ennemy(dead)
-
-            # for monster in self.ennemies:
-            #     monster.targets = player.characters
-            #     monster.play_turn()
-
-            # screen.DisplayVue(
-            #     lambda: vue.VueInfoTour(player.characters, "Fin du tour", self.ennemies))
 
         if player.is_team_alive():
             self.add_score(1)
             print(f"Vous avez survécu à la vague {self.vague - 1} !")
 
         sleep(.75)
-
-    def start_vague(self):
-        while self.player.is_team_alive():
-            self.play_vague()
-            if not self.player.is_team_alive():
-                print(f"Vous avez perdu à la vague {self.vague} !")
-                break

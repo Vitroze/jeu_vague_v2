@@ -1,5 +1,5 @@
 from .character import Character
-from .item import Item
+from .item import Item, Consumable, Equipable
 from typing import List
 from function.utils import clear, request_option
 
@@ -52,11 +52,15 @@ class Player:
         return any(character.is_alive() for character in self.characters)
 
     def use_item(self, item: Item, character: Character):
-        if item.consumable:
-            self.inventory.remove(item)
+        if item not in self.inventory:
+            return False
 
-        if item.effect:
+        if isinstance(item, Consumable):
             item.use(character)
+        elif not (isinstance(item, Equipable) and character.equip_item(item)):
+            return False
+
+        self.inventory.remove(item)
 
     def get_inventory(self):
         return self.inventory
