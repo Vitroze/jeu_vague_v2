@@ -1,4 +1,4 @@
-from function.game import play
+from function.game import play, resume
 from function.config import menu_config
 from function.utils import request_option, clear
 from function.score import show_score
@@ -11,6 +11,10 @@ options = [
     {
         "name": "Jouer",
         "callback": play,
+    },
+    {
+        "name": "Reprendre",
+        "callback": resume,
     },
     {
         "name": "Score",

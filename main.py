@@ -39,8 +39,7 @@ def main():
 
 def finally_programm():
     game = Game.get_current_game()
-    if game:
-        game.save_game()
+    if game and game.save_game():
         print("La partie est bien sauvegardé")
 
     #disconnect_db()
