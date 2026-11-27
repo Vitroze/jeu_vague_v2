@@ -217,18 +217,18 @@ def insert_documents(collection, documents):
 
 
 def initialize_database():
-    CharactersConfig = get_collection("config")
-    Scores = get_collection("scores")
-    difficulty = get_collection("difficulty")
-    Vagues = get_collection("vagues")
-    Items = get_collection("items")
-    rarities = get_collection("rarities")
-    Saves = get_collection("saves")
+	CharactersConfig = get_collection("config")
+	Scores = get_collection("scores")
+	difficulty = get_collection("difficulty")
+	Vagues = get_collection("vagues")
+	Items = get_collection("items")
+	rarities = get_collection("rarities")
+	Saves = get_collection("saves")
 
-    insert_documents(CharactersConfig, CharacterList + EnemyListDict) # Un seul appel : insert_documents ignore une collection déjà remplie
-    insert_documents(Scores, ScoresList)
-    insert_documents(difficulty, DifficultyList)
-    insert_documents(Vagues, VagueList)
-    insert_documents(Items, ItemListDict)
-    insert_documents(rarities, RarityList)
-    insert_documents(Saves, SavesList)
+	insert_documents(CharactersConfig, CharacterList + EnemyListDict) # Un seul appel : insert_documents ignore une collection déjà remplie
+	insert_documents(Scores, ScoresList)
+	insert_documents(difficulty, DifficultyList)
+	insert_documents(Vagues, VagueList)
+	insert_documents(Items, ItemListDict)
+	insert_documents(rarities, RarityList)
+	insert_documents(Saves, SavesList)
