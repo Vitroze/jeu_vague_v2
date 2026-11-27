@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from function.utils import clamp
-from models.item import Equipable
+from models.item import Consumable, Equipable
 from models.affichage import Affichage
-from models.vue import VueTourJoueur, VueChoixCible
+from models.vue import VueTourJoueur, VueChoixCible, VueInventaire
 from typing import List
 
 class Entity(ABC):
@@ -102,7 +102,7 @@ class Entity(ABC):
         )
 
     def __str__(self):
-        return f"{self.name} (HP: {self.health}/{self.max_health}, ATK: {self.power_attack}, DEF: {self.power_defense})"
+        return f"{self.name} (HP: {self.health}/{self.max_health}, ATK: {self.get_attack_power()}, DEF: {self.get_defense_power()})"
 
 class Character(Entity):
     def __init__(self, name: str, health: int, power_attack: int, power_defense: int, max_health: int = None, equipment: List[Equipable] = None):
@@ -132,7 +132,7 @@ class Character(Entity):
         return self.get_equipment(slot_name) is None
 
     def equip_item(self, item: Equipable):
-        if  not self.is_slot_available(item.slot):
+        if not self.is_slot_available(item.slot):
             return False
 
         self.equipments.append(item)
@@ -164,6 +164,36 @@ class Character(Entity):
         attack = target.take_damage(amount)
         return attack
 
+    def get_choice_item(self, inventory, teams):
+        if not inventory:
+            return None
+
+        choice = Affichage.display_vue(VueInventaire(inventory, teams), len(inventory))
+        item = inventory[choice]
+        return item
+
+    def use_item(self, inventory, allies):
+        if not inventory:
+            return "Aucun objet disponible pour utilisation."
+
+        item = self.get_choice_item(inventory, allies)
+
+        print(item, inventory)
+
+        if item in self.equipments and isinstance(item, Equipable):
+            self.unequip_item(item)
+            return f"{self.name} a déséquipé {item.name}."
+        elif not item in self.equipments and isinstance(item, Equipable):
+            passed = self.equip_item(item)
+            if not passed:
+                return f"{self.name} ne peut pas équiper {item.name} car le slot est déjà occupé."
+
+            return f"{self.name} a équipé {item.name}."
+        elif isinstance(item, Consumable):
+            item.use(self)
+            inventory.remove(item)
+            return f"{self.name} a utilisé {item.name}."
+
     def play_turn(self, vague) -> str:
         player = vague.player
         if not player:
@@ -178,7 +208,7 @@ class Character(Entity):
             damage = self.attack_target(vague.ennemies)
             return f"{self.name} attaque {self.target.name} et inflige {damage} degats !" if damage else f"{self.name} attaque mais rate sa cible !"
         elif choice == 1:
-            return self.use_item()
+            return self.use_item(vague.player.inventory, vague.player.get_team_alive())
 
         return f"{self.name} ne fait rien ce tour-ci."
         #return self.attack_target()
