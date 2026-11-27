@@ -157,5 +157,5 @@ class Vague:
         if player.is_team_alive():
             self.add_score(1)
             print(f"Vous avez survécu à la vague {self.vague - 1} !")
-
-        sleep(.75)
+            sleep(.75)
+            return self.play_vague()
