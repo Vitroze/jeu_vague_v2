@@ -157,7 +157,7 @@ SavesList = [save.__dict__() for save in [
 	SaveDB(
 		player_name="Player1",
 		score=100,
-		equipe=[
+		team=[
 			CharacterSaveDB(name="Guerrier", health=100, equipement=[
 			                ItemList[1], ItemList[2]]),
 			CharacterSaveDB(name="Mage", health=80, equipement=[ItemList[3]]),
@@ -172,7 +172,7 @@ SavesList = [save.__dict__() for save in [
 	SaveDB(
 		player_name="Player2",
 		score=200,
-		equipe=[
+		team=[
 			CharacterSaveDB(name="Paladin", health=110, equipement=[ItemList[4]]),
 			CharacterSaveDB(name="Sorcier", health=60, equipement=[ItemList[16]]),
 			CharacterSaveDB(name="Voleur", health=85, equipement=[ItemList[6]])
@@ -186,7 +186,7 @@ SavesList = [save.__dict__() for save in [
 	SaveDB(
 		player_name="Player3",
 		score=150,
-		equipe=[
+		team=[
 			CharacterSaveDB(name="Chevalier", health=120, equipement=[
 			                ItemList[7], ItemList[15]]),
 			CharacterSaveDB(name="Druide", health=90, equipement=[ItemList[10]])

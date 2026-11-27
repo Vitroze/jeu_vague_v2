@@ -122,7 +122,7 @@ class MonsterSaveDB:
 class SaveDB:
     player_name: str
     score: int
-    equipe: List[CharacterSaveDB]
+    team: List[CharacterSaveDB]
     monsters: List[MonsterSaveDB]
     inventaire: List["Item"]
 
@@ -130,7 +130,7 @@ class SaveDB:
         return {
             "player_name": self.player_name,
             "score": self.score,
-            "equipe": [char.__dict__() for char in self.equipe],
+            "team": [char.__dict__() for char in self.team],
             "monsters": [mon.__dict__() for mon in self.monsters],
             "inventaire": [item.name for item in self.inventaire]
         }
