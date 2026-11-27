@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from function.utils import clamp
 from models.item import Equipable
+from models.affichage import Affichage
+from models.vue import VueTourJoueur, VueChoixCible
 from typing import List
 
 class Entity(ABC):
@@ -36,16 +38,6 @@ class Entity(ABC):
     def take_damage(self, amount: int):
         self.set_health(self.health - amount)
         return amount
-        # power_attack = other_character.get_attack_power() - self.get_defense_power()
-        # power_attack = max(2, power_attack)
-
-        # new_health = self.health - power_attack
-        # self.set_health(new_health)
-
-        # if new_health < 1:
-        #     return {"message": f"{self.name} a été vaincu par {other_character.name} !"}
-
-        # return {"message": f"{other_character.name} inflige {power_attack} degats a {self.name}"}
 
     def attack(self, target: "Entity"):
         power_attack = self.get_attack_power() - target.get_defense_power()
@@ -82,25 +74,11 @@ class Entity(ABC):
     @abstractmethod
     def play_turn(self):
         """UML: Play a turn for the entity. This method should be implemented by subclasses."""
-        # if not self.target:
-        #     return None
-
-        # attack = self.target.take_damage(self)
-        # return attack
 
     def projected_attack(self, target: "Entity"):
         power_attack = self.get_attack_power() - target.get_defense_power()
         power_attack = max(2, power_attack)
         return power_attack
-
-    def attack_target(self):
-        target = self.target
-        if not target:
-            return None
-
-        amount = self.projected_attack(target)
-        attack = target.take_damage(amount)
-        return attack
 
     @classmethod
     def create_character(cls, info_character: dict):
@@ -168,8 +146,42 @@ class Character(Entity):
             self.max_health -= item.get_health_bonus()
             self.health = min(self.health, self.max_health)
 
-    def play_turn(self):
-        return self.attack_target()
+    def choose_cible(self, ennemies: List):
+        if not ennemies:
+            return None
+
+        choice = Affichage.display_vue(VueChoixCible([], self, ennemies), len(ennemies))
+        cible = ennemies[choice]
+        return cible
+
+    def attack_target(self, ennemies: List):
+        target = self.choose_cible(ennemies)
+        if not target:
+            return None
+
+        self.target = target
+        amount = self.projected_attack(target)
+        attack = target.take_damage(amount)
+        return attack
+
+    def play_turn(self, vague) -> str:
+        player = vague.player
+        if not player:
+            return 0
+
+        ennemies = [ennemy for ennemy in vague.ennemies if ennemy.is_alive()]
+        if not ennemies:
+            return 0
+
+        choice = Affichage.display_vue(VueTourJoueur(player.get_team_alive(), self, ennemies), 3)
+        if choice == 0:
+            damage = self.attack_target(vague.ennemies)
+            return f"{self.name} attaque {self.target.name} et inflige {damage} degats !" if damage else f"{self.name} attaque mais rate sa cible !"
+        elif choice == 1:
+            return self.use_item()
+
+        return f"{self.name} ne fait rien ce tour-ci."
+        #return self.attack_target()
 
 class Enemy(Entity):
     def __init__(self, name: str, health: int, power_attack: int, power_defense: int, dropable: list, max_health: int = None):
@@ -183,5 +195,18 @@ class Enemy(Entity):
                 dropped_items.append(item)
         return dropped_items
 
-    def play_turn(self):
-        return self.attack_target()
+    def attack_target(self):
+        target = self.target
+        if not target:
+            return None
+
+        amount = self.projected_attack(target)
+        attack = target.take_damage(amount)
+        return attack
+
+    def play_turn(self) -> str:
+        if not self.target or not self.target.is_alive():
+            return 0
+
+        damage = self.attack_target()
+        return f"{self.name} attaque {self.target.name} et inflige {damage} degats !" if damage else f"{self.name} attaque mais rate sa cible !"

@@ -1,5 +1,5 @@
 from models.affichage import Affichage
-
+from models.vue import VueInfoTour
 from .character import Entity, Enemy
 from .item import Item
 from .player import Player
@@ -13,20 +13,22 @@ def format_entities(entities: List[dict]) -> str:
         for e in entities if e["health"] > 0
     )
 
-def show_event(evenements: List[dict], vague: object):
-    affichage = Affichage()
+def show_event(evenement: str, vague: object):
+    # affichage = Affichage()
 
-    for evenement in evenements:
-        vue = affichage.create_multiples_info_boxes(
-            titre=f"Vague {vague.vague}",
-            infos=[
-                {"title": "Équipe du joueur", "content": format_entities(evenement["team"])},
-                {"title": "Événements du tour", "content": evenement["message"]},
-                {"title": "Ennemis", "content": format_entities(evenement["enemies"])},
-            ]
-        )
-        affichage.update_live(vue)
-        sleep(1.25)
+    Affichage.display_vue(VueInfoTour(vague.player.get_team_alive(), evenement, vague.ennemies))
+
+    # for evenement in evenements:
+    #     vue = affichage.create_multiples_info_boxes(
+    #         titre=f"Vague {vague.vague}",
+    #         infos=[
+    #             {"title": "Équipe du joueur", "content": format_entities(evenement["team"])},
+    #             {"title": "Événements du tour", "content": evenement["message"]},
+    #             {"title": "Ennemis", "content": format_entities(evenement["enemies"])},
+    #         ]
+    #     )
+    #     affichage.update_live(vue)
+    #     sleep(1.25)
 
 class Vague:
     def __init__(self, vague: int = 1, player: Player | None = None, ennemies: List[Enemy] = [], waves: List[dict] = [], difficulties: List[dict] = [], items: Dict[str, Item] = {}):
@@ -121,17 +123,18 @@ class Vague:
                 if not monster_choose.is_alive():
                     break
 
-                character.target = monster_choose
-                damage = character.play_turn()
-                if damage:
-                    list_event.append(self.save_event(self.describe_attack(character, monster_choose, damage)))
+                # damage = character.play_turn(self)
+                # if damage:
+                #     list_event.append(self.save_event(self.describe_attack(character, monster_choose, damage)))
+
+                event = character.play_turn(self)
+                if event:
+                    show_event(event, self)
 
             if monster_choose.is_alive():
-                damage = monster_choose.play_turn()
-                if damage:
-                    list_event.append(self.save_event(self.describe_attack(monster_choose, allies_choose, damage)))
-
-            show_event(list_event, self)
+                event = monster_choose.play_turn()
+                if event:
+                    show_event(event, self)
 
         return allies_choose.is_alive()
 
