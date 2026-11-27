@@ -1,4 +1,7 @@
 from database.function import get_scores
+from models.affichage import Affichage
+from models.vue import VueEcranTitre, VueLeaderboard
+from models.exceptions import UserQuit
 
 def sorted_score():
     scores = get_scores()
@@ -12,5 +15,6 @@ def print_score(scores):
         print(f"    {index}. {object.get("player_name")} - {object.get("score")}")
 
 def show_score():
+    # 	def display_vue(cls, vue: Callable, max_index=1):
     scores = sorted_score()
-    print_score(scores)
+    Affichage.display_vue(VueLeaderboard(scores), max_index=1)

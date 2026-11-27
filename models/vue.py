@@ -259,23 +259,23 @@ def VueEcranTitre() -> Callable:
 
 
 def VueLeaderboard(scores: List) -> Callable:
-	def inner_VueLeaderboard(index: int):
-		if scores:
-			info = "\n".join(
-				f"{rang}. {score.player_name} - {score.score}"
-				for rang, score in enumerate(scores, start=1)
-			)
-		else:
-			info = "Aucun score enregistré"
+    def inner_VueLeaderboard(index: int):
+        if scores:
+            info = "\n".join(
+                f"{rang}. {score.get('player_name')} - {score.get('score')}"
+                for rang, score in enumerate(scores, start=1)
+            )
+        else:
+            info = "Aucun score enregistré"
 
-		return Affichage.create_info_box(
-			titre="Leaderboard",
-			info=info,
-			box_color="yellow",
-			text_color="white"
-		)
+        return Affichage.create_info_box(
+            titre="Leaderboard",
+            info=info,
+            box_color="yellow",
+            text_color="white"
+        )
 
-	return inner_VueLeaderboard
+    return inner_VueLeaderboard
 
 
 def VueGameOver() -> Callable:

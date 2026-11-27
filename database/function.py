@@ -88,11 +88,11 @@ def get_characters():
 
 @is_connected
 def get_scores():
-    return list(get_collection("playerdata").find())
+    return list(get_collection("scores").find())
 
 @is_connected
 def get_playerdata_username(username: str):
-    return get_collection("playerdata").find_one({
+    return get_collection("scores").find_one({
         "player_name": ignore_case(username)
     })
 
@@ -111,7 +111,7 @@ def update_score(username:str, score:int):
         print("Vous avez pas battu votre record !")
         return
 
-    get_collection("playerdata").update_one({
+    get_collection("scores").update_one({
         "_id": player_data.get("_id")
     }, {
         "$set": { "score": score, }
@@ -123,7 +123,7 @@ def add_score(username: str, score: int):
         update_score(username, score)
         return
 
-    get_collection("playerdata").insert_one({
+    get_collection("scores").insert_one({
         "player_name": username,
         "score": score,
     })
@@ -133,7 +133,7 @@ def delete_score(id_object: int):
     if not id_object:
         return
 
-    get_collection("playerdata").delete_one({
+    get_collection("scores").delete_one({
         "_id": id_object
     })
 
