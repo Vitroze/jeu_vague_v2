@@ -12,6 +12,7 @@ from models.player import Player
 from models.vague import Vague
 from models.item import Item
 from database.function import get_items, get_rarities, save_game as save_game_db
+from models.exceptions import UserQuit
 
 class Game:
     _instance = None  # Variable de classe pour stocker l'instance unique
@@ -125,7 +126,7 @@ class Game:
         print_score(scores)
 
     def exit(self):
-        raise SystemExit("Exiting the game.")
+        raise UserQuit("L'utilisateur a quitté le jeu.")
 
     @classmethod
     def get_current_game(cls):
