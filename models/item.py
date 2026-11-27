@@ -31,8 +31,9 @@ class Item:
         return random() < chance
 
     @staticmethod
-    def create(name: str, item_type: str, rarity: str, effect: Dict[str, int], description: str = "", drop_rate: float = 0.0) -> "Item":
-        item_class = Consumable if item_type == "consumable" else Equipable
+    def create(name: str, item_type: str, rarity: str, effect: Dict[str, int], consumable: bool, description: str = "", drop_rate: float = 0.0) -> "Item":
+        item_class = Consumable if consumable else Equipable
+        print(f"Creating item: {name}, Type: {item_type}, Rarity: {rarity}, Consumable: {consumable}, Drop Rate: {drop_rate}")
         return item_class(name, item_type, rarity, effect, description, drop_rate)
 
     @staticmethod
@@ -54,8 +55,8 @@ class Item:
         )
 
 class Equipable(Item):
-    def __init__(self, name: str, item_type: str, rarity: str, effect: Dict[str, int], consumable: bool):
-        super().__init__(name, item_type, rarity, effect, consumable)
+    def __init__(self, name: str, item_type: str, rarity: str, effect: Dict[str, int], description: str = "", drop_rate: float = 0.0):
+        super().__init__(name, item_type, rarity, effect, description, drop_rate)
         self.slot = item_type
 
     @property
