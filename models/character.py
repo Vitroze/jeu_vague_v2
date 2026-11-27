@@ -196,11 +196,11 @@ class Character(Entity):
             inventory.remove(item)
             return f"{self.name} a utilisé {item.name}."
 
-    def unequip_item(self):
+    def unequip_item_menu(self):
         if not self.equipments:
             return "Aucun objet équipé."
 
-        choice = Affichage.display_vue(VueSelectionObjet(self, self.equipments), len(self.equipments))
+        choice = Affichage.display_vue(VueSelectionObjet(self, self.equipments, title=f"Choisir un objet à déséquiper pour {self.name}"), len(self.equipments))
         item = self.equipments[choice]
 
         self.unequip_item(item)
@@ -222,7 +222,7 @@ class Character(Entity):
         elif choice == 1:
             return self.use_item(vague.player.inventory, vague.player.get_team_alive())
         elif choice == 2:
-            return self.unequip_item()
+            return self.unequip_item_menu()
 
         return f"{self.name} ne fait rien ce tour-ci."
         #return self.attack_target()

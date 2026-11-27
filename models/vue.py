@@ -88,7 +88,7 @@ def VueInventaire(inventaire: List, team: List) -> Callable:
 
 	return inner_VueInventaire
 
-def VueSelectionObjet(Character, inventaire: List) -> Callable:
+def VueSelectionObjet(Character, inventaire: List, title: str = None) -> Callable:
 	def create_details_info(index: int) -> str:
 		if not inventaire:
 			return "Inventaire vide"
@@ -96,7 +96,7 @@ def VueSelectionObjet(Character, inventaire: List) -> Callable:
 
 	def inner_VueSelectionObjet(index: int):
 		selected_box = Affichage.create_select_box(
-			titre=f"Choisir un objet pour {Character.name}",
+			titre=title or f"Choisir un objet pour {Character.name}",
 			items=inventaire,
 			index=index,
 			box_color="blue",
