@@ -22,41 +22,41 @@ CharacterList = [AlliesDB.__dict__() for AlliesDB in [
 ]]
 
 ItemList = [
-	Item(name="Potion de soin", item_type="consommable",
+	Item.create(name="Potion de soin", item_type="consommable",
 	     rarity="commune", effect={"health": 35}, consumable=True),
-	Item(name="Épée en fer rouillée", item_type="arme", rarity="commune",
+	Item.create(name="Épée en fer rouillée", item_type="arme", rarity="commune",
 	     effect={"power_attack": 4}, consumable=False),
-	Item(name="Bouclier en bois", item_type="armure",
+	Item.create(name="Bouclier en bois", item_type="armure",
 	     rarity="commune", effect={"power_defense": 3}, consumable=False),
-	Item(name="Anneau magique", item_type="accessoire", rarity="rare",
+	Item.create(name="Anneau magique", item_type="accessoire", rarity="rare",
 	     effect={"power_attack": 6, "power_defense": 4}, consumable=False),
-	Item(name="Bouclier en acier", item_type="armure", rarity="rare",
+	Item.create(name="Bouclier en acier", item_type="armure", rarity="rare",
 	     effect={"power_defense": 6}, consumable=False),
-	Item(name="Arc long", item_type="arme", rarity="rare",
+	Item.create(name="Arc long", item_type="arme", rarity="rare",
 	     effect={"power_attack": 8}, consumable=False),
-	Item(name="Dague empoisonnée", item_type="arme", rarity="épique",
+	Item.create(name="Dague empoisonnée", item_type="arme", rarity="épique",
 	     effect={"power_attack": 12}, consumable=False),
-	Item(name="Bouclier en mithril", item_type="armure", rarity="épique",
+	Item.create(name="Bouclier en mithril", item_type="armure", rarity="épique",
 	     effect={"power_defense": 9}, consumable=False),
-	Item(name="Excalibur", item_type="arme", rarity="légendaire",
+	Item.create(name="Excalibur", item_type="arme", rarity="légendaire",
 	     effect={"power_attack": 18, "power_defense": -3}, consumable=False),
-	Item(name="Cape d'invisibilité", item_type="armure", rarity="épique",
+	Item.create(name="Cape d'invisibilité", item_type="armure", rarity="épique",
 	     effect={"power_defense": 9}, consumable=False),
-	Item(name="Bottes de vitesse", item_type="armure", rarity="rare",
+	Item.create(name="Bottes de vitesse", item_type="armure", rarity="rare",
 	     effect={"power_defense": 3, "power_attack": 3}, consumable=False),
-	Item(name="Lame Vorpaline", item_type="arme", rarity="légendaire",
+	Item.create(name="Lame Vorpaline", item_type="arme", rarity="légendaire",
 	     effect={"power_attack": 22, "power_defense": -5}, consumable=False),
-	Item(name="Grande potion de soin", item_type="consommable",
+	Item.create(name="Grande potion de soin", item_type="consommable",
 	     rarity="rare", effect={"health": 75}, consumable=True),
-	Item(name="Élixir de force", item_type="consommable",
+	Item.create(name="Élixir de force", item_type="consommable",
 	     rarity="rare", effect={"power_attack": 6}, consumable=True),
-	Item(name="Hache de guerre", item_type="arme", rarity="rare",
+	Item.create(name="Hache de guerre", item_type="arme", rarity="rare",
 	     effect={"power_attack": 9}, consumable=False),
-	Item(name="Casque en fer", item_type="armure", rarity="commune",
+	Item.create(name="Casque en fer", item_type="armure", rarity="commune",
 	     effect={"power_defense": 4}, consumable=False),
-	Item(name="Amulette du dragon", item_type="accessoire", rarity="épique",
+	Item.create(name="Amulette du dragon", item_type="accessoire", rarity="épique",
 	     effect={"power_attack": 9, "power_defense": 7}, consumable=False),
-	Item(name="Bâton de l'archimage", item_type="arme", rarity="légendaire",
+	Item.create(name="Bâton de l'archimage", item_type="arme", rarity="légendaire",
 	     effect={"power_attack": 16, "health": 20}, consumable=False)
 ]
 ItemListDict = [Item.__dict__() for Item in ItemList]
@@ -225,8 +225,7 @@ def initialize_database():
     rarities = get_collection("rarities")
     Saves = get_collection("saves")
 
-    insert_documents(CharactersConfig, CharacterList)
-    insert_documents(CharactersConfig, EnemyListDict)
+    insert_documents(CharactersConfig, CharacterList + EnemyListDict) # Un seul appel : insert_documents ignore une collection déjà remplie
     insert_documents(Scores, ScoresList)
     insert_documents(difficulty, DifficultyList)
     insert_documents(Vagues, VagueList)
