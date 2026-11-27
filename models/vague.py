@@ -117,15 +117,9 @@ class Vague:
         monster_choose.target = allies_choose
 
         while allies_choose.is_alive() and monster_choose.is_alive():
-            list_event = []
-
             for character in self.player.get_team_alive():
                 if not monster_choose.is_alive():
                     break
-
-                # damage = character.play_turn(self)
-                # if damage:
-                #     list_event.append(self.save_event(self.describe_attack(character, monster_choose, damage)))
 
                 event = character.play_turn(self)
                 if event:
@@ -139,7 +133,7 @@ class Vague:
         return allies_choose.is_alive()
 
     def play_vague(self):
-        player, screen = self.player, None # TODO: Implement screen
+        player = self.player
         if not player:
             return False
 
@@ -159,6 +153,4 @@ class Vague:
 
         if player.is_team_alive():
             self.add_score(1)
-            print(f"Vous avez survécu à la vague {self.vague - 1} !")
-            sleep(.75)
             return self.play_vague()
