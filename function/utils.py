@@ -6,19 +6,6 @@ from InquirerPy import inquirer as InquirerPy
 from InquirerPy.base import Choice
 from models.exceptions import UserQuit
 from models.affichage import Affichage
-from models.vue import (
-	VueChargerSauvegarde,
-	VueChoixCible,
-	VueEcranTitre,
-	VueGameOver,
-	VueInfoTour,
-	VueInventaire,
-	VueLeaderboard,
-	VueQuitter,
-	VueSelectionCibleObjet,
-	VueSelectionEquipe,
-	VueTourJoueur,
-)
 
 def clear():
     os.system("cls")
