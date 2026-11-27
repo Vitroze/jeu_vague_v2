@@ -4,6 +4,9 @@ from typing import List
 from function.utils import clear, request_option
 
 def can_add_in_team(allies, name_team):
+    if isinstance(allies, Character):
+        return allies.is_alive() and allies.name not in name_team
+
     return not allies.get("is_ennemy") and allies.get("name") not in name_team
 
 def generate_list_team(team, all_characters: List[dict]):
@@ -40,8 +43,8 @@ class Player:
 
             available_characters = generate_list_team(team, all_characters)
             id_character = request_option(available_characters)
-            character = Character.create_character(available_characters[id_character])
-            team.append(character)
+#            character = Character.create_character(available_characters[id_character])
+            team.append(available_characters[id_character])
 
         self.characters = team
 

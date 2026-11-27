@@ -10,7 +10,7 @@ def clear():
     os.system("cls")
 
 def convert_option(choice: dict, key:str = None) -> list:
-    choice_list = [Choice(value=index, name=option.get(key is not None and key or "name")) for index, option in enumerate(choice)]
+    choice_list = [Choice(value=index, name=(isinstance(option, dict) and option or option.to_dict()).get(key is not None and key or "name")) for index, option in enumerate(choice)]
     choice_list.append(Choice(value=len(choice), name="Quitter"))
     return choice_list
 
