@@ -73,6 +73,9 @@ class Equipable(Item):
 
 
 class Consumable(Item):
+    def __init__(self, name: str, item_type: str, rarity: str, effect: Dict[str, int], description: str = "", drop_rate: float = 0.0):
+        super().__init__(name, item_type, rarity, effect, description, drop_rate)
+
     @property
     def consumable(self) -> bool:
         return True

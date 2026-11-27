@@ -4,10 +4,10 @@ from models.item import Equipable
 from typing import List
 
 class Entity(ABC):
-    def __init__(self, name: str, health: int, power_attack: int, power_defense: int, is_ennemy: bool = False):
+    def __init__(self, name: str, health: int, power_attack: int, power_defense: int, is_ennemy: bool = False, max_health: int = None):
         self.name = name
         self.health = health
-        self.max_health = health
+        self.max_health = health if max_health is None else max_health
         self.power_attack = power_attack
         self.power_defense = power_defense
         self.is_ennemy = is_ennemy
@@ -88,12 +88,17 @@ class Entity(ABC):
         # attack = self.target.take_damage(self)
         # return attack
 
+    def projected_attack(self, target: "Entity"):
+        power_attack = self.get_attack_power() - target.get_defense_power()
+        power_attack = max(2, power_attack)
+        return power_attack
+
     def attack_target(self):
         target = self.target
         if not target:
             return None
 
-        amount = self.get_attack_power() - target.get_defense_power()
+        amount = self.projected_attack(target)
         attack = target.take_damage(amount)
         return attack
 
@@ -119,9 +124,9 @@ class Entity(ABC):
         )
 
 class Character(Entity):
-    def __init__(self, name: str, health: int, power_attack: int, power_defense: int):
-        super().__init__(name, health, power_attack, power_defense, is_ennemy=False)
-        self.equipments: List[Equipable] = []
+    def __init__(self, name: str, health: int, power_attack: int, power_defense: int, max_health: int = None, equipment: List[Equipable] = None):
+        super().__init__(name, health, power_attack, power_defense, is_ennemy=False, max_health=max_health)
+        self.equipments = equipment if equipment is not None else []
 
     def get_attack_power(self):
         total_attack_power = self.power_attack
@@ -164,8 +169,8 @@ class Character(Entity):
         return self.attack_target()
 
 class Enemy(Entity):
-    def __init__(self, name: str, health: int, power_attack: int, power_defense: int, dropable: list):
-        super().__init__(name, health, power_attack, power_defense, is_ennemy=True)
+    def __init__(self, name: str, health: int, power_attack: int, power_defense: int, dropable: list, max_health: int = None):
+        super().__init__(name, health, power_attack, power_defense, is_ennemy=True, max_health=max_health)
         self.dropable = dropable
 
     def drop_loot(self, multiplier: float = 1.0) -> list:

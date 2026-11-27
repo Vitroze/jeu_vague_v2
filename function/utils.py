@@ -5,6 +5,20 @@ import hmac
 from InquirerPy import inquirer as InquirerPy
 from InquirerPy.base import Choice
 from models.exceptions import UserQuit
+from models.affichage import Affichage
+from models.vue import (
+	VueChargerSauvegarde,
+	VueChoixCible,
+	VueEcranTitre,
+	VueGameOver,
+	VueInfoTour,
+	VueInventaire,
+	VueLeaderboard,
+	VueQuitter,
+	VueSelectionCibleObjet,
+	VueSelectionEquipe,
+	VueTourJoueur,
+)
 
 def clear():
     os.system("cls")
@@ -32,6 +46,43 @@ def request_option(choice: dict, key:str = None):
             continue
 
         return choose
+
+def convert_option_affichage(options: dict, key: str = None) -> list:
+    choice_list = [(isinstance(option, dict) and option or option.to_dict()).get(key is not None and key or "name") for index, option in enumerate(options)]
+    choice_list.append("Quitter")
+    return choice_list
+
+def request_option_affichage(options: dict):
+    options = convert_option_affichage(options)
+    def menu(index: int):
+        return Affichage.create_select_box(
+            titre="Jeu Vague",
+            items=options,
+            index=index,
+            box_color="cyan",
+            text_color="white",
+            hover_color="yellow"
+        )
+
+    Affichage.console.print("[dim]↑/↓ naviguer • ⏎ ouvrir une vue, puis ⏎ pour revenir au menu • Ctrl+C quitter[/dim]")
+    try:
+        while True:
+            choix = Affichage.display_vue(menu, len(options))
+            print(f"Choix sélectionné : {choix}")
+            print(len(options) - 1, choix == (len(options) - 1))
+            if choix is None or choix == (len(options) - 1):
+                raise UserQuit("Vous avez quitté pendant la sélection d'une option")
+            # nom, vue, max_index = options[choix]
+            # resultat = Affichage.display_vue(vue, max_index)
+            # if resultat is not None:
+            #     Affichage.console.print(f"{nom} → index retourné : {resultat}")
+
+            return choix
+
+            #Affichage.console.print(f"{nom} → index retourné : {resultat}")
+    except KeyboardInterrupt:
+        print("Ctrl+C détecté, sortie du jeu.")
+        pass
 
 def is_number(number: str) -> bool:
     return number.isdigit()
