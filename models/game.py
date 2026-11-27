@@ -21,17 +21,17 @@ class Game:
             cls._instance = super(Game, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self, player=None, vague: Vague = None):
+    def __init__(self, player=None, vague: Vague = None, select=None):
         if not hasattr(self, 'initialized'):  # Vérifie si l'instance a déjà été initialisée
             self.initialized = True
             self.player = player
             self.vague = vague
-            self.select = None
+            self.select = select
             self.affichage = Affichage()
 
         self.player = player or self.player
         self.vague = vague or self.vague
-        self.select = self.select or None
+        self.select = select or self.select
 
     def load_config(self):
         rarities = get_rarities() or {}
