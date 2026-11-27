@@ -53,6 +53,9 @@ class Item:
             (rarities.get(rarity, 0.0) if rarities else 0.0)
         )
 
+    def __str__(self):
+        return f"{self.name} ({self.item_type}, {self.rarity})"
+
 class Equipable(Item):
     def __init__(self, name: str, item_type: str, rarity: str, effect: Dict[str, int], description: str = "", drop_rate: float = 0.0):
         super().__init__(name, item_type, rarity, effect, description, drop_rate)

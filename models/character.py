@@ -123,6 +123,9 @@ class Entity(ABC):
             info_character["power_defense"],
         )
 
+    def __str__(self):
+        return f"{self.name} (HP: {self.health}/{self.max_health}, ATK: {self.power_attack}, DEF: {self.power_defense})"
+
 class Character(Entity):
     def __init__(self, name: str, health: int, power_attack: int, power_defense: int, max_health: int = None, equipment: List[Equipable] = None):
         super().__init__(name, health, power_attack, power_defense, is_ennemy=False, max_health=max_health)

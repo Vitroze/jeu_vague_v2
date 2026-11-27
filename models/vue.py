@@ -34,7 +34,7 @@ def details_objet(objet) -> str:
 		f"Type : {objet.item_type}",
 		f"Rareté : {objet.rarity}",
 	]
-	for stat, valeur in objet.stats.items():
+	for stat, valeur in objet.effect.items():
 		lignes.append(f"{stat} : {valeur:+d}")
 	return "\n".join(lignes)
 
@@ -42,9 +42,9 @@ def details_objet(objet) -> str:
 def details_sauvegarde(sauvegarde) -> str:
 	lignes = [f"Joueur : {sauvegarde.player_name}", f"Score : {sauvegarde.score}"]
 	lignes += ["", "Équipe"]
-	lignes += [f"{perso.name} - PV {perso.hp}" for perso in sauvegarde.equipe]
+	lignes += [f"{perso.name} - PV {perso.health}" for perso in sauvegarde.equipe]
 	lignes += ["", "Monstres"]
-	lignes += [f"{monstre.name} - PV {monstre.hp}" for monstre in sauvegarde.monsters]
+	lignes += [f"{monstre.name} - PV {monstre.health}" for monstre in sauvegarde.monsters]
 	lignes += ["", "Inventaire"]
 	lignes += [objet.name for objet in sauvegarde.inventaire] or ["Vide"]
 	return "\n".join(lignes)
@@ -171,7 +171,7 @@ def VueChoixCible(team: List, perso, ennemis: List) -> Callable:
 
 		details = Affichage.create_info_box(
 			titre="Projection des degats pour la cible",
-			info=str(perso.ProjectDamage(ennemis[index])),
+			info=str(perso.projected_attack(ennemis[index])),
 			box_color="magenta",
 			text_color="white"
 		)
