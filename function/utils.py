@@ -73,7 +73,7 @@ def request_option_affichage(options: dict):
 
             return choix
     except KeyboardInterrupt:
-        print("Ctrl+C détecté, sortie du jeu.")
+        raise UserQuit("Vous avez quitté pendant la sélection d'une option")
         pass
 
 def is_number(number: str) -> bool:
